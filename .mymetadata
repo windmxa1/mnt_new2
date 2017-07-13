@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="mnt_new2"
+  id="myeclipse.1472525695323"
+  context-root="/mnt_new2"
+  j2ee-spec="5.0"
+  archive="mnt_new2.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

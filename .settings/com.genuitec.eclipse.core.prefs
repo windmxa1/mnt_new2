@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+validator.Checked=WebRoot/js,WebRoot/client2.html,WebRoot/nodeMainTest.js,WebRoot/public
+validator.Unchecked=

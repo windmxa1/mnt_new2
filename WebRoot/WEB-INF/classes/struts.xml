@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<package name="global" extends="struts-default">
+		<interceptors>
+			<interceptor name="authority" class="org.filter.authInterceptor" />
+			<interceptor-stack name="mydefault">
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="authority"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="mydefault" />
+		<global-results>
+			<result name="login">
+				<!-- <param name="actionName">nvrIpc</param> <param name="namespace">/</param> -->
+			</result>
+		</global-results>
+	</package>
+
+	<package name="default" extends="struts-default" namespace="/">				<!-- getUserList -->
+		<action name="nvrIpc" class="org.action.MaintenanceAction">
+			<result name="success">/test.jsp</result>
+			<result name="error">/index.jsp</result>
+		</action>
+		<action name="delnvrIpc" class="org.action.MaintenanceAction"
+			method="delnvrIpc">
+			<result name="success" type="redirectAction">
+				<param name="actionName">nvrIpc</param>
+				<param name="namespace">/</param>
+			</result>
+			<result name="error">/test.jsp</result>
+		</action>
+		<action name="rewrite" class="org.action.MaintenanceAction"
+			method="rewrite">
+			<result name="success" type="redirectAction">
+				<param name="actionName">nvrIpc</param>
+				<param name="namespace">/</param>
+			</result>
+			<result name="error">/test.jsp</result>
+		</action>
+		<action name="insert" class="org.action.MaintenanceAction"
+			method="insert">
+			<result name="success" type="redirectAction">
+				<param name="actionName">nvrIpc</param>
+				<param name="namespace">/</param>
+			</result>
+			<result name="error">/test.jsp</result>
+		</action>
+	</package>
+	<package name="sensor" extends="json-default,global" namespace="/">
+		<action name="getWaterloggingList" class="org.action.SensorsAction"
+			method="getWaterloggingList">	<!-- 水浸 -->
+			<result type="json" name="success"><!-- 传感器 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getTempList" class="org.action.SensorsAction"
+			method="getTempList">	<!-- 温度 -->
+			<result type="json" name="success"><!-- 传感器 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getWetList" class="org.action.SensorsAction"
+			method="getWetList">	<!-- 湿度 -->
+			<result type="json" name="success"><!-- 传感器 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getAirConditionList" class="org.action.SensorsAction"
+			method="getAirConditionList">	<!-- 空调 -->
+			<result type="json" name="success"><!-- 传感器 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+	<package name="ajax" extends="json-default,global" namespace="/">
+		<action name="login" class="org.action.ZUserAction" method="login">	<!-- login -->
+			<!-- 将返回类型设置为json -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+			<result type="json" name="error">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="listTest" class="org.action.TestAction">			<!-- listTest -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getIPCInfo" class="org.action.GetIPCListAction">	<!-- getIPCInfo -->
+			<result type="json" name="success"><!-- 8 摄像 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<action name="getNVRInfo" class="org.action.GetNVRListAction">	<!-- getNVRInfo -->
+			<result type="json" name="success"><!-- 10网络录像 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getNVRInfo1" class="org.action.GetNVRListAction"
+			method="getNVRInfo">	<!-- getNVRInfo -->
+			<result type="json" name="success"><!-- 10网络录像 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getDCInfo" class="org.action.GetDCListAction">	<!-- getDCInfo -->
+			<result type="json" name="success"><!-- 9门禁 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getMapInfo" class="org.action.MapAction">	<!-- getMapInfo百度地图获取地址 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getAllHostsByGroupid" class="org.action.MapAction"
+			method="getAllHostsByGroupid">	<!-- 获取二级界面数据，机房所对应的所有类型的主机 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getErrorCount" class="org.action.MapAction"
+			method="getErrorCount">	<!-- 获取二级界面数据，对应机房的当前月份各个设备类型的异常统计 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getMonthErr" class="org.action.MapAction" method="getMonthErr">	<!-- 获取二级界面数据，对应机房的所有月份的所有设备类型的异常统计 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getStatistics" class="org.action.GetStatisticsAction"
+			method="getFailure">	<!-- 获取统计界面数据，按类型按月份列出所有设备的统计信息 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getErr" class="org.action.GetStatisticsAction"
+			method="getErr">	<!-- 当前月份 按设备类型列出对应的故障总数 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getErr1" class="org.action.GetStatisticsAction"
+			method="getErr1">	<!-- 当前月份 各个机房的故障总数 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getErr2" class="org.action.GetStatisticsAction"
+			method="getErr2">	<!-- 各个月份的故障总数 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getDCEvents" class="org.action.GetDCListAction"
+			method="getDCEvents">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<action name="test1" class="org.action.DeviceTestAction"
+			method="test1">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="test2" class="org.action.DeviceTestAction"
+			method="test2">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="test3" class="org.action.DeviceTestAction"
+			method="test3">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="test4" class="org.action.DeviceTestAction"
+			method="test4">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="test5" class="org.action.DeviceTestAction"
+			method="test5">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+
+		<!-- 用户-角色 -->
+		<action name="addUR" class="org.action.ZUserRoleAction" method="addUR">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getURList" class="org.action.ZUserRoleAction"
+			method="getURList">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="updateUR" class="org.action.ZUserRoleAction"
+			method="updateUR">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="deleteUR" class="org.action.ZUserRoleAction"
+			method="deleteUR">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getRList" class="org.action.ZRoleAction" method="getRList">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 角色-权限 -->
+		<action name="addRA" class="org.action.ZRoleAuthorityAction"
+			method="addRA">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getRAList" class="org.action.ZRoleAuthorityAction"
+			method="getRAList">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="deleteRA" class="org.action.ZRoleAuthorityAction"
+			method="deleteRA">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="updateRA" class="org.action.ZRoleAuthorityAction"
+			method="updateRA">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<action name="getSes" class="org.action.MapAction" method="getSes">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+			<result type="json" name="error">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 权限 -->
+		<action name="getAList" class="org.action.ZAuthorityAction"
+			method="getAList">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<action name="addUser" class="org.action.ZUserAction" method="addUser">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="add" class="org.action.userDemoAction" method="add">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 导出xls -->
+		<action name="xlsExport" class="org.action.XlsAction" method="xlsExport">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="pathTest" class="org.action.XlsAction" method="pathTest">
+			<result type="json">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 客户端主机 -->
+		<action name="getClientInfo" class="org.action.GetClientListAction">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getClientCpuInfo" class="org.action.GetClientListAction"
+			method="getClientCpuInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getClientMemInfo" class="org.action.GetClientListAction"
+			method="getClientMemInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getClientNetInfo" class="org.action.GetClientListAction"
+			method="getClientNetInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getClientDiskInfo" class="org.action.GetClientListAction"
+			method="getClientDiskInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getClientCPU10Info" class="org.action.GetClientListAction"
+			method="getClientCPU10Info">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getClientOtherInfo" class="org.action.GetClientListAction"
+			method="getClientOtherInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 服务器主机 -->
+		<action name="getServerInfo" class="org.action.GetServerListAction">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getServerCpuInfo" class="org.action.GetServerListAction"
+			method="getServerCpuInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getServerMemInfo" class="org.action.GetServerListAction"
+			method="getServerMemInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getServerNetInfo" class="org.action.GetServerListAction"
+			method="getServerNetInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getServerDiskInfo" class="org.action.GetServerListAction"
+			method="getServerDiskInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getServerCpu10Info" class="org.action.GetServerListAction"
+			method="getServerCpu10Info">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getServerOtherInfo" class="org.action.GetServerListAction"
+			method="getServerOtherInfo">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 公告 -->
+		<action name="addBoard" class="org.action.ZBoardAction" method="addBoard">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="deleteBoard" class="org.action.ZBoardAction"
+			method="deleteBoard">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getBoardList" class="org.action.ZBoardAction"
+			method="getBoardList">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<!-- 文件传输 -->
+		<action name="fileUpload" class="org.action.ZFileAction"
+			method="fileUpload">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+			<!-- <param name="allowedTypes"></param> 允许文件类型 -->
+			<interceptor-ref name="fileUpload">
+				<param name="maximumSize">1048576000</param>  <!-- 1000M -->
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack" /> <!-- 默认拦截器 -->
+		</action>
+		<action name="fileDownload" class="org.action.ZFileAction">
+			<result name="success" type="stream">
+				<param name="contentType">text/plain</param>
+				<param name="contentDisposition">attachment;fileName="${fileName}"</param>
+				<param name="inputName">fileDown</param>
+				<param name="bufferSize">1024</param>
+			</result>
+		</action>
+		<action name="getFileList" class="org.action.ZFileAction"
+			method="getFileList">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="deleteFile" class="org.action.ZFileAction"
+			method="deleteFile">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+
+	<package name="chat" extends="json-default,global" namespace="/">
+		<!-- 聊天模块 -->
+
+		<action name="saveFriendId" class="org.action.ZChatAction"
+			method="saveFriendId">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="checkNewMsg" class="org.action.ZChatAction"
+			method="checkNewMsg">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getChatMsg" class="org.action.ZChatAction"
+			method="getLatestMsg">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="sendChatMsg" class="org.action.ZChatAction"
+			method="chat">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getChatHistory" class="org.action.ZChatAction"
+			method="getHistory">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getChatUserList" class="org.action.ZChatAction"
+			method="userList">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+	</package>
+
+	<package name="mission" extends="json-default,global"
+		namespace="/">
+		<!-- 任务发布模块 -->
+		<action name="saveFriendId1" class="org.action.ZMissionAction"
+			method="saveFriendId1">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getNewTask" class="org.action.ZMissionAction"
+			method="getNewTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="checkNewTask" class="org.action.ZMissionAction"
+			method="checkNewTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="addMission" class="org.action.ZMissionAction"
+			method="addMission">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getUnCompleteTask" class="org.action.ZMissionAction"
+			method="getUnCompleteTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="receiverGetAllTask" class="org.action.ZMissionAction"
+			method="receiverGetAllTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getUnConfirmTask" class="org.action.ZMissionAction"
+			method="getUnConfirmTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="senderGetAllTask" class="org.action.ZMissionAction"
+			method="senderGetAllTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="completeTask" class="org.action.ZMissionAction"
+			method="completeTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="confirmTask" class="org.action.ZMissionAction"
+			method="confirmTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="canCelTask" class="org.action.ZMissionAction"
+			method="canCelTask">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+	</package>
+	<!-- 设置允许传输最大值 1024MB==1073741824 KB -->
+	<constant name="struts.multipart.maxSize" value="1073741824" />
+
+</struts>

@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="UTF-8">
+	<title>机房环境监控系统</title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="extrabags/css/style.css" />	
+	<link rel="stylesheet" type="text/css" href="extrabags/css/bmap.css" />
+</head>
+<body>
+	<div id="client_loadingimg" class="loadingimg"><div>
+	<script type="text/javascript">
+		var Ext = Ext || {}; 
+		Ext.defaultAppName = '机房动力环境集中监控系统';
+		Ext.beforeLoad = function (tags) {
+			var s = location.search,  // the query string (ex "?foo=1&bar")
+				profile;			
+			if (s.match(/\bclassic\b/)) {
+				profile = 'classic';
+			}
+			else if (s.match(/\bmodern\b/)) {
+				profile = 'modern';
+			}
+			else {
+				profile = tags.phone ? 'modern' : 'classic';
+			}
+			Ext.manifest = 'app/'+ profile + '_local'; // this name must match a build profile name
+			Ext.homePath = '';
+			Ext.homePath1 = '';
+			//Ext.manifest.resources = 'static/client/sencha/app/resources';
+			Ext.main_res_Path = 'app/resources';
+		};
+	 </script>
+ 	<script id="microloader" type="text/javascript" src="app/bootstrap.js"></script>
+ 	<script type="text/javascript" src="extrabags/js/apiv2.0.min.js"></script>
+ 	<script src="extrabags/js/md5.js"></script>
+</body>
+</html>
