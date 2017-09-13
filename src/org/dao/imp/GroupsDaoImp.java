@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.JSONArray;
-
 import org.dao.GroupsDao;
-import org.dao.ItemsDao;
-import org.dao.JfHostDao;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -21,177 +17,226 @@ import com.opensymphony.xwork2.ActionContext;
 
 public class GroupsDaoImp implements GroupsDao {
 
-	public List<Object[]> getHostListByGroupid(Long groupid) {// 根据groupid种类获取设备列表
-		try {
-			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
-			
-			Map<String, Object> map = ActionContext.getContext().getSession();
-			
-			System.out.println(map.get("groupId"));
-			String sql = "";
-			if(map.get("groupId")!=null){
-				JfHostDao jfDao = new JfHostDaoImp();
-				List<String> hostips = jfDao.getHostip((Long) map.get("groupId"));
-				int i = 0;
-				for(String host:hostips){
-					if(i==0){ 
-					sql = "and (h.host='"+host+"'";
-						if(hostips.size()==1){
-							sql = sql +") ";
-						}
-					}
-					else if(i==hostips.size()-1){
-						sql = sql + " or h.host='" + host+"') ";
-					}else {
-						sql = sql + " or h.host='" + host+"'";
-					}
-					i++;
-				}
-			}
-			System.out.println(sql);
-			Query query = session
-					.createQuery("select h.hostid,h.host,h.name,g.groupid,g.name from Hosts h,Groups g,HostsGroups hg where h.hostid=hg.hostid "+sql+"and hg.groupid=g.groupid and h.status=0 and g.groupid=?");
-			query.setParameter(0, groupid);
-			List<Object[]> list = query.list();
-			System.out.println(JSONArray.fromObject(list).toString());
-			ts.commit();
-			HibernateSessionFactory.closeSession();
-			/*
-			 * 通过组id获取所属所有设备 GroupsDao gDao = new GroupsDaoImp(); List<Object[]>
-			 * li =gDao.getHostByGroupid((long) 8); for(Object o[] : li){
-			 * for(Object a : o){ System.out.print(a.toString()+" "); }
-			 * System.out.println("\n"); }
-			 */
-			return list;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	public List<Object[]> getGroupLists() {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 
 			Query query = session.createQuery("from Groups");
 			List<Object[]> list = query.list();
 
-			ts.commit();
-			HibernateSessionFactory.closeSession();
-			/*
-			 * 通过组id获取所属所有设备 GroupsDao gDao = new GroupsDaoImp(); List<Object[]>
-			 * li =gDao.getHostByGroupid((long) 8); for(Object o[] : li){
-			 * for(Object a : o){ System.out.print(a.toString()+" "); }
-			 * System.out.println("\n"); }
-			 */
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
-	public List getgroupIdsByhostId(Long hostid) {
+
+	public List<Long> getgroupIdsByhostId(Long hostid) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 			String sql = "select  groupid from HostsGroups where hostid = ?";
 			Query query = session.createQuery(sql);
 			query.setParameter(0, hostid);
 
-			List list = query.list();
-			
-			ts.commit();
-			HibernateSessionFactory.closeSession();
-			
+			List<Long> list = query.list();
+
+
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
 	@Override
-	public List getHostListByGroupid02(Long groupid) {	//网络主机用
+	public List<Object[]> getHostListByGroupid02(Long groupid) { // 网络主机用
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
-			
-			String sql="select h.hostid,h.host " +
-							"from Hosts h,HostsGroups hg " +
-							"where h.hostid=hg.hostid " +
-								"and (h.flags<2 or h.flags>2) " +
-								"and h.status=0 " +
-								"and hg.groupid=? ";
-			
+
+			String sql = "select h.hostid,h.host "
+					+ "from Hosts h,HostsGroups hg "
+					+ "where h.hostid=hg.hostid "
+					+ "and (h.flags<2 or h.flags>2) " + "and h.status=0 "
+					+ "and hg.groupid=? ";
+
 			Query query = session.createQuery(sql);
 			query.setParameter(0, groupid);
 			List<Object[]> list = query.list();
-			
-			HibernateSessionFactory.closeSession();
+
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
 	@Override
-	public List getHostListByGroupid03(Long groupid) {	//监控主机用
+	public List<Object[]> getHostListByGroupid03(Long groupid) { // 监控主机用
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			String sql="select h.hostid,h.host " +
-					"from Hosts h,HostsGroups hg " +
-					"where h.hostid=hg.hostid " +
-						"and (h.flags<2 or h.flags>2) " +
-						"and h.status=0 " +
-						"and hg.groupid=? ";
-	
+			String sql = "select h.hostid,h.host "
+					+ "from Hosts h,HostsGroups hg "
+					+ "where h.hostid=hg.hostid "
+					+ "and (h.flags<2 or h.flags>2) " + "and h.status=0 "
+					+ "and hg.groupid=? ";
+
 			Query query = session.createQuery(sql);
 			query.setParameter(0, groupid);
 			List<Object[]> list = query.list();
-			
+
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		} finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
-		/**		使用方式
-		GroupsDao gDao = new GroupsDaoImp();
-		
-		List<Object[]> list = gDao.getHostListByGroupid03(10L);
-		for(Object[] o:list){
-			String id = o[0].toString();
-			String ip = o[1].toString();
-			System.out.println("id: "+id);
-			System.out.println("ip: "+ip);
-		}
-		return list;
+		/**
+		 * 使用方式 GroupsDao gDao = new GroupsDaoImp();
+		 * 
+		 * List<Object[]> list = gDao.getHostListByGroupid03(10L); for(Object[]
+		 * o:list){ String id = o[0].toString(); String ip = o[1].toString();
+		 * System.out.println("id: "+id); System.out.println("ip: "+ip); }
+		 * return list;
 		 */
 	}
 
+	/**
+	 * 获取地址段
+	 */
+	private String getIpRange(Long groupid) {
+		String host = "";
+		switch ("" + groupid) {
+		case "8":
+			host = "192.168.117";
+			break;
+		case "9":
+			host = "192.168.116";
+			break;
+		case "10":
+			break;
+		default:
+			break;
+		}
+		return host;
+	}
+
 	@Override
-	public List getLiveHostByGroupid(Long groupid) {
+	public List<VHostGroupId> getLiveHostByGroupid(Long groupid, Integer start,
+			Integer limit) {
+		// Long time = System.currentTimeMillis();
 		try {
+			Map<String, Object> session1 = ActionContext.getContext()
+					.getSession();
+			String sql = "";
 			Session session = HibernateSessionFactory.getSession();
-			String sql = "select * from v_host_group where groupid=?";
-			SQLQuery sqlQuery = session.createSQLQuery(sql);
-			sqlQuery.setParameter(0, groupid);
+			SQLQuery sqlQuery = null;
+			String groupName = (String) session1.get("groupName");
+			if (groupName != null) {
+				sql = "select * from v_host_group where name like ? and host like ? order by hostid";
+				sqlQuery = session.createSQLQuery(sql);
+				sqlQuery.setParameter(0, "%" + groupName + "%");
+				String host = getIpRange(groupid);
+				sqlQuery.setParameter(1, "%" + host + "%");
+			} else {
+				sql = "select * from v_host_group where groupid=? order by hostid";
+				sqlQuery = session.createSQLQuery(sql);
+				sqlQuery.setParameter(0, groupid);
+			}
+			if (start == null)
+				start = 0;
+			if (limit == null) {
+				limit = 15;
+				sqlQuery.setMaxResults(limit);
+			} else if (limit == -1) {
+			} else {
+				sqlQuery.setMaxResults(limit);
+			}
+			sqlQuery.setFirstResult(start);
 			sqlQuery.addEntity(VHostGroup.class);
 			List<VHostGroup> li = sqlQuery.list();
-			
-			List list = new ArrayList<>();
-			for(VHostGroup v:li){
+
+			List<VHostGroupId> list = new ArrayList<>();
+			for (VHostGroup v : li) {
 				list.add(v.getId());
 			}
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		} finally{
+		} finally {
+			// System.out.println(System.currentTimeMillis() - time + "毫秒");
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public Long getHostCountByGroupid(Long groupid) {
+		try {
+			String sql = "";
+			Session session = HibernateSessionFactory.getSession();
+			Query query = null;
+			Map<String, Object> session1 = ActionContext.getContext()
+					.getSession();
+			String groupName = (String) session1.get("groupName");
+			if (groupName != null) {
+				sql = "select count(v.id.groupid) from VHostGroup v where v.id.name like ? and v.id.host like ?";
+				query = session.createQuery(sql);
+				query.setParameter(0, "%" + groupName + "%");
+				String host = getIpRange(groupid);
+				query.setParameter(1, "%" + host + "%");
+			} else {
+				sql = "select count(v.id.groupid) from VHostGroup v where v.id.groupid=?";
+				query = session.createQuery(sql);
+				query.setParameter(0, groupid);
+			}
+			query.setMaxResults(1);
+			Long count = (Long) query.uniqueResult();
+			return count;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0L;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<String> getGroupList() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select name from Groups g where g.name like '%JF%' and name !='JF-宾馆路主局' ";
+			Query query = session.createQuery(sql);
+			List<String> list = query.list();
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public String getJFNameByHost(String host) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select id.name from VHostGroup where id.host= ? and id.name like '%JF%'";
+			Query query = session.createQuery(sql);
+			query.setParameter(0, host);
+			query.setMaxResults(1);
+			String name = (String) query.uniqueResult();
+			return name;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}

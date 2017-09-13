@@ -21,11 +21,15 @@ public interface ZRoleAuthorityDao {
 //	 */
 //	public boolean deleteRA(int id);
 	/**
+	 * 修改角色权限，原理：删除并添加
+	 */
+	public boolean updateRoleAuthority(int roleId,int[] authorityId);
+	/**
 	 * 通过角色id 获取对应的权限id
 	 * @param roleId
 	 * @return
 	 */
-	public List getAListByR(int roleId);
+	public List<Integer> getAListByR(int roleId);
 	/**
 	 * 获取关联表
 	 * @return

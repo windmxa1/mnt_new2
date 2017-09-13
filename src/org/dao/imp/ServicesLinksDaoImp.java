@@ -19,7 +19,6 @@ public class ServicesLinksDaoImp implements ServicesLinksDao {
 		// TODO Auto-generated method stub
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 			
 			Query query = session
 					.createQuery("from ServicesLinks where serviceupid = ?");
@@ -27,13 +26,14 @@ public class ServicesLinksDaoImp implements ServicesLinksDao {
 			// System.out.println("serviceupid:"+serviceupid);
 			List<ServicesLinks> list = query.list();
 
-			ts.commit();
-			HibernateSessionFactory.closeSession();
+			
 
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 
 	}
@@ -41,7 +41,6 @@ public class ServicesLinksDaoImp implements ServicesLinksDao {
 	public Long getUpServiceId(Long servicedownid){
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 
 			Query query = session
 					.createQuery("select serviceupid from ServicesLinks where servicedownid = ?");
@@ -49,13 +48,14 @@ public class ServicesLinksDaoImp implements ServicesLinksDao {
 			query.setMaxResults(1);
 			Long upserviceid = (Long) query.uniqueResult();
 
-			ts.commit();
-			HibernateSessionFactory.closeSession();
+			
 
 			return upserviceid;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 	

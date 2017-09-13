@@ -8,28 +8,40 @@
     <class name="speed.view.VSensors" table="v_sensors" catalog="speedmonitor">
         <composite-id name="id" class="speed.view.VSensorsId">
             <key-property name="no" type="java.lang.Integer">
-                <column name="NO" />
+                <column name="no" />
             </key-property>
             <key-property name="ip" type="java.lang.String">
-                <column name="IP" length="20" />
+                <column name="ip" length="20" />
             </key-property>
             <key-property name="type" type="java.lang.Short">
-                <column name="TYPE" />
+                <column name="type" />
             </key-property>
             <key-property name="unit" type="java.lang.Short">
-                <column name="UNIT" />
+                <column name="unit" />
             </key-property>
             <key-property name="displayname" type="java.lang.String">
-                <column name="DISPLAYNAME" length="17" />
+                <column name="displayname" length="17" />
             </key-property>
             <key-property name="overresult" type="java.lang.Double">
-                <column name="OVERRESULT" precision="7" />
+                <column name="overresult" precision="11" />
             </key-property>
             <key-property name="lowerresult" type="java.lang.Double">
-                <column name="LOWERRESULT" precision="7" />
+                <column name="lowerresult" precision="11" />
             </key-property>
             <key-property name="sensorvalue" type="java.lang.Double">
-                <column name="SENSORVALUE" precision="7" />
+                <column name="sensorvalue" precision="11" />
+            </key-property>
+            <key-property name="location" type="java.lang.String">
+                <column name="location" length="40" />
+            </key-property>
+            <key-property name="status" type="java.lang.Integer">
+                <column name="status" />
+            </key-property>
+            <key-property name="message" type="java.lang.String">
+                <column name="message" length="22" />
+            </key-property>
+            <key-property name="available" type="java.lang.Integer">
+                <column name="available" />
             </key-property>
         </composite-id>
     </class>

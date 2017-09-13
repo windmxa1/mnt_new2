@@ -30,6 +30,10 @@ public interface ZUserRoleDao {
 	 */
 	public int getRByU(int userId);
 	/**
+	 * 获取用户角色关联对象
+	 */
+	public ZUserRole getUserRole(int userId);
+	/**
 	 * 获取关联表
 	 * @return
 	 */

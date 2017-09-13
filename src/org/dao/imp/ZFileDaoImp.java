@@ -58,7 +58,6 @@ public class ZFileDaoImp implements ZFileDao{
 			for (VZfile b : li) {
 				list.add(b.getId());
 			}
-			HibernateSessionFactory.closeSession();
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -99,11 +98,12 @@ public class ZFileDaoImp implements ZFileDao{
 			ZFile f = (ZFile) session.load(ZFile.class, id);
 			session.delete(f);
 			ts.commit();
-			HibernateSessionFactory.closeSession();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -115,11 +115,12 @@ public class ZFileDaoImp implements ZFileDao{
 			Query query = session.createQuery(sql);
 			query.setMaxResults(1);
 			Long count = (Long) query.uniqueResult();
-			HibernateSessionFactory.closeSession();
 			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return (long) -1;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 }

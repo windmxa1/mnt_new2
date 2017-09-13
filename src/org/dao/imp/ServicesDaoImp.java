@@ -1,5 +1,6 @@
 package org.dao.imp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dao.ServicesDao;
@@ -8,35 +9,32 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.model.Services;
 import org.util.HibernateSessionFactory;
+import org.view.VServices;
+import org.view.VServicesId;
 
 public class ServicesDaoImp implements ServicesDao {
 
 	/**
 	 * 获取一级服务组，即机房组
 	 */
-	public List<Services> getServicesGroup() {
-		// TODO Auto-generated method stub
-
+	public List<VServicesId> getServicesGroup() {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
-
 			Query query = session
-					.createQuery("from Services where name like 'JF%'");
-			List<Services> list = query.list();
-
-			ts.commit();
-			HibernateSessionFactory.closeSession();
-			/*
-			 * 通过组id获取所属所有设备 GroupsDao gDao = new GroupsDaoImp(); List<Object[]>
-			 * li =gDao.getHostByGroupid((long) 8); for(Object o[] : li){
-			 * for(Object a : o){ System.out.print(a.toString()+" "); }
-			 * System.out.println("\n"); }
-			 */
-			return list;
+					.createQuery("from VServices v where v.id.name like 'JF%' and v.id.name != 'JF-宾馆路主局' ");
+			List<VServices> list = query.list();
+			List<VServicesId> list2 = new ArrayList<>();
+			if (list != null && list.size() > 0) {
+				for (VServices v : list) {
+					list2.add(v.getId());
+				}
+			}
+			return list2;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -45,7 +43,6 @@ public class ServicesDaoImp implements ServicesDao {
 
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 
 			Query query = session
 					.createQuery("from Services where serviceid = ?");
@@ -53,18 +50,12 @@ public class ServicesDaoImp implements ServicesDao {
 			query.setMaxResults(1);
 			Services s = (Services) query.uniqueResult();
 
-			ts.commit();
-			HibernateSessionFactory.closeSession();
-			/*
-			 * 通过组id获取所属所有设备 GroupsDao gDao = new GroupsDaoImp(); List<Object[]>
-			 * li =gDao.getHostByGroupid((long) 8); for(Object o[] : li){
-			 * for(Object a : o){ System.out.print(a.toString()+" "); }
-			 * System.out.println("\n"); }
-			 */
 			return s;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -73,7 +64,6 @@ public class ServicesDaoImp implements ServicesDao {
 
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 
 			Query query = session
 					.createQuery("from Services where triggerid = ?");
@@ -81,12 +71,12 @@ public class ServicesDaoImp implements ServicesDao {
 			query.setMaxResults(1);
 			Services s = (Services) query.uniqueResult();
 
-			ts.commit();
-			HibernateSessionFactory.closeSession();
 			return s;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 

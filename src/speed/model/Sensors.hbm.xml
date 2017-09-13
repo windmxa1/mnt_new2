@@ -38,10 +38,10 @@
             <column name="AlarmEnable" />
         </property>
         <property name="overResult" type="java.lang.Double">
-            <column name="OverResult" precision="7" />
+            <column name="OverResult" precision="11" />
         </property>
         <property name="lowerResult" type="java.lang.Double">
-            <column name="LowerResult" precision="7" />
+            <column name="LowerResult" precision="11" />
         </property>
         <property name="overAction" type="java.lang.Short">
             <column name="OverAction" />

@@ -16,4 +16,17 @@ public interface ZAuthorityDao {
 	 * 通过Id获取Action名
 	 */
 	public String getActionById(Integer Id);
+	/**
+	 * 获取角色对应权限列表
+	 */
+	public List<ZAuthority> getAList(Integer roleId); 
+	/**
+	 * 获取角色对应的权限列表名称
+	 */
+	public List<String> getAliasList(Integer roleId);
+	/**
+	 * 获取角色对应的Action
+	 */
+	public List<String> getActionListByUser(Integer userId);
+	
 }

@@ -40,7 +40,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 	public List<ZMission> getUnReadMission(Integer uid, int key) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 
 			String sql = "";
 			if (key == 0) // 发送人
@@ -51,7 +50,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			Query query = session.createQuery(sql);
 			query.setParameter(0, uid);
 			List<ZMission> list = query.list();
-			ts.commit();
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -66,7 +64,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			Integer start, Integer limit) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 			if (limit == -1) {
 				limit = 15;
 			}
@@ -84,7 +81,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			query.setMaxResults(limit);
 			query.setFirstResult(start);
 			List<ZMission> list = query.list();
-			ts.commit();
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -98,7 +94,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 	public Long getUnCompleteMissionCount(Integer uid, int key) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 			String sql = "";
 			if (key == 0) {
 				sql = "select count(id) from ZMission where senderId = ? and isComplete = 0";
@@ -109,7 +104,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			query.setParameter(0, uid);
 			query.setMaxResults(1);
 			long a = (long) query.uniqueResult();
-			ts.commit();
 
 			return a;
 		} catch (Exception e) {
@@ -125,7 +119,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			Integer start, Integer limit) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 
 			if (limit == -1) {
 				limit = 15;
@@ -145,7 +138,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			query.setFirstResult(start);
 			query.setMaxResults(limit);
 			List<ZMission> list = query.list();
-			ts.commit();
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -159,7 +151,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 	public Long getUnConfirmMissionCount(Integer uid, int key) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 			String sql = "";
 			if (key == 0) {
 				sql = "select count(id) from ZMission where senderId = ? and isConfirm = 0";
@@ -171,7 +162,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			query.setMaxResults(1);
 			// List<Object[]> list = query.list();
 			long a = (long) query.uniqueResult();
-			ts.commit();
 
 			return a;
 		} catch (Exception e) {
@@ -187,7 +177,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			Integer limit) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 			if (limit == -1) {
 				limit = 15;
 			}
@@ -206,7 +195,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			query.setFirstResult(start);
 			List<ZMission> list = query.list();
 
-			ts.commit();
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -220,7 +208,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 	public Long getAllMissionCount(Integer uid, int key) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 			String sql = "";
 			if (key == 0) {
 				sql = "select count(id) from ZMission where senderId = ? ";
@@ -232,7 +219,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			query.setMaxResults(1);
 			// List<Object[]> list = query.list();
 			long a = (long) query.uniqueResult();
-			ts.commit();
 
 			return a;
 		} catch (Exception e) {
@@ -247,7 +233,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 	public long checkLastestMission(Integer receive_id) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
 
 			String sql = "select count(id) from ZMission where isRead = 0 and receiverId = ?";
 			Query query = session.createQuery(sql);
@@ -255,7 +240,6 @@ public class ZMissionDaoImp implements ZMissionDao {
 			query.setMaxResults(1);
 			// List<Object[]> list = query.list();
 			long a = (long) query.uniqueResult();
-			ts.commit();
 
 			return a;
 		} catch (Exception e) {

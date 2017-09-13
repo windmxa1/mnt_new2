@@ -1,199 +1,239 @@
 package org.dao.imp;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.dao.DeviceInfoDao;
-import org.dao.HistoryTextDao;
-import org.dao.HostDao;
-import org.dao.HostInventoryDao;
-import org.dao.ItemsDao;
-import org.dao.ServicesDao;
-import org.dao.ServicesLinksDao;
-import org.dao.TriggersDao;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.model.DcEvents;
-import org.model.HistoryText;
-import org.model.HostInventory;
-import org.model.Hosts;
-import org.model.Items;
-import org.model.Services;
 import org.util.HibernateSessionFactory;
+import org.view.VDcEvents;
+import org.view.VDcEventsId;
+import org.view.VItemValue;
+import org.view.VItemValueId;
+
+import com.opensymphony.xwork2.ActionContext;
 
 public class DeviceDaoImp implements DeviceInfoDao {
-	// 是否应该传LIST进来循环处理每一种设备的全部信息
-	public List<Map<String, String>> getDeviceInfo(List<Object[]> list,
-			String group) { // 摄像头（待定：是否需要写3个设备的？？？）
-		List<Map<String, String>> infoList = new ArrayList<Map<String, String>>();
-		for (Object[] o : list) {
-			String a = o[0].toString(); // 设备id,设备ip,name,groupid,**
-			Long hostId = Long.parseLong(a);
 
-			/***********************************
-			 * @description 找到摄像头对应NVR，并从中取出摄像头对应告警信息
-			 */
-			ItemsDao iDao = new ItemsDaoImp();
-			List<Items> iList = iDao.getItemsByHostid(hostId);//
-
-			Map<String, String> infoMap = new HashMap<String, String>();
-			String hostIp = o[1].toString();
-			// 每次循环都把主机对应的items项存放到map中
-			for (Items i : iList) { // 遍历对应ip的每一个items，获取itemid对应的value，并保存到map
-				HistoryTextDao htDao = new HistoryTextDaoImp();
-				HistoryText ht = htDao.getItemsValueByItemId(i.getItemid());
-				// 传入的group参数代表组号，属于约定属性，记得修改！！！！！！
-				if (group.equals("8") && i.getName().equals("deviceAlarm")) {// 根据获得的数据格式把NVR对应通道对应摄像头的告警信息取出
-					// DeviceInfoDao dDao = new DeviceDaoImp();
-					NvrIpcDao nvrIpcDao = new NvrIpcDaoImp();
-					HostDao hDao = new HostDaoImp();
-					String nvrHost = nvrIpcDao.getNvrByIpc(hostIp);
-					Hosts nvrH = hDao.getHostByHostip(nvrHost);
-					HistoryText ht1 = htDao.getDeviceAlarmByHostId(nvrH
-							.getHostid());
-					String Avalue = ht1.getValue();
-					int channel = nvrIpcDao.getChannel(hostIp);
-					String deviceAlarm = "";
-					if (!Avalue.equals("")) {
-						int k = 0;
-						String[] s = Avalue.split(";");
-						for (String s1 : s) {
-							String[] s2 = s1.split("-");
-							if (s2[3].equals("" + channel)) {// 通道号符合要求
-								if (k == 0) {
-									deviceAlarm = s2[0];
-								} else {
-									deviceAlarm = deviceAlarm + "," + s2[0];
-								}
-								k++;
-							}
-						}
-					}
-					ht.setValue(deviceAlarm);
-				}
-				String V = ht.getValue();
-				// System.out.println("..."+V+"...");
-				System.out.println(i.getName() + "----" + V + ".");
-				infoMap.put(i.getName(), V); // 具体某个设备的全部信息
-
-			}
-			infoMap.put("hostIp", "" + o[1].toString());
-			infoMap.put("hostId", a);
-
-			HostInventoryDao hiDao = new HostInventoryDaoImp();
-
-			HostInventory hi = hiDao.getHostInventory(hostId);
-			infoMap.put("contact", hi.getContact());
-			infoMap.put("deployment", hi.getDeployment_status());
-			infoMap.put("location", hi.getLocation());
-			infoMap.put("locationLat", hi.getLocationLat());
-			infoMap.put("locationLon", hi.getLocationLon());
-			infoMap.put("name", hi.getName());
-
-			// 获取业务告警统一的状态，设备状态不需要进行显示
-			ServicesDao sDao = new ServicesDaoImp();
-			// sDao.getServiceByTriggerIds();
-			TriggersDao tDao = new TriggersDaoImp();
-			List triggerids = tDao.getTriggersByHostId(hostId);
-			System.out.println(triggerids.toString());
-			for (Object triggerid : triggerids) {
-				// 通过triggerid向上找到对应的属性名称
-				Services s = sDao.getServiceByTriggerId((Long) triggerid);
-				if (s != null) {
-					System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-							+ s.getName());
-					ServicesLinksDao sLinksDao = new ServicesLinksDaoImp();
-					Services s1 = sDao.getServicesById((sLinksDao
-							.getUpServiceId(s.getServiceid())));
-					System.out.println(s1.getName() + "," + s1.getStatus());
-				}
-			}
-
-			infoList.add(infoMap);
-		}
-		return infoList;
-	}
-
-	public Map<String, String> getInfoMap(Long hostid,String group) {
-		ItemsDao iDao = new ItemsDaoImp();
-		HostDao hDao = new HostDaoImp();
-		List<Items> iList = iDao.getItemsByHostid(hostid);//
-
-		Map<String, String> infoMap = new HashMap<String, String>();
-		String hostIp = hDao.getHostByHostid(hostid).getHost();
-		// 每次循环都把主机对应的items项存放到map中
-		for (Items i : iList) { // 遍历对应ip的每一个items，获取itemid对应的value，并保存到map
-			HistoryTextDao htDao = new HistoryTextDaoImp();
-			HistoryText ht = htDao.getItemsValueByItemId(i.getItemid());
-			// 传入的group参数代表组号，属于约定属性，记得修改！！！！！！
-			if (group.equals("8") && i.getName().equals("deviceAlarm")) {// 根据获得的数据格式把NVR对应通道对应摄像头的告警信息取出
-				// DeviceInfoDao dDao = new DeviceDaoImp();
-				NvrIpcDao nvrIpcDao = new NvrIpcDaoImp();
-				String nvrHost = nvrIpcDao.getNvrByIpc(hostIp);
-				Hosts nvrH = hDao.getHostByHostip(nvrHost);
-//				System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"+nvrH.getHostid());
-				HistoryText ht1 = htDao
-						.getDeviceAlarmByHostId(nvrH.getHostid());
-//				System.out.println(">>>>>>>>Ht.Value<<<<<<<<"+ht1.getValue());
-				String Avalue = ht1.getValue();
-				int channel = nvrIpcDao.getChannel(hostIp);
-				String deviceAlarm = "";
-				if (!Avalue.equals("")) {
-					int k = 0;
-					String[] s = Avalue.split(";");
-					for (String s1 : s) {
-						String[] s2 = s1.split("-");
-						if (s2[3].equals("" + channel)) {// 通道号符合要求
-							if (k == 0) {
-								deviceAlarm = s2[0];
-							} else {
-								deviceAlarm = deviceAlarm + "," + s2[0];
-							}
-							k++;
-						}
-					}
-				}
-				ht.setValue(deviceAlarm);
-			}
-			String V = ht.getValue();
-			System.out.println(i.getName() + "----" + V + ".");
-			infoMap.put(i.getName(), V); // 具体某个设备的全部信息
-
-		}
-		infoMap.put("hostIp", ""+hostIp);
-		infoMap.put("hostId", ""+hostid);
-
-		HostInventoryDao hiDao = new HostInventoryDaoImp();
-
-		HostInventory hi = hiDao.getHostInventory(hostid);
-		infoMap.put("contact", hi.getContact());
-		infoMap.put("deployment", hi.getDeployment_status());
-		infoMap.put("location", hi.getLocation());
-		infoMap.put("locationLat", hi.getLocationLat());
-		infoMap.put("locationLon", hi.getLocationLon());
-		infoMap.put("name", hi.getName());
-		return infoMap;
-	}
-
-	public List<DcEvents> getDCEvents(String DcHost) {
-		// TODO Auto-generated method stub
+	@Override
+	public List<VDcEventsId> getDCEvents(String DcHost, Integer start,
+			Integer limit) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
 			Transaction ts = session.beginTransaction();
-			String sql = "from DcEvents where host = ?";
+			String sql = "from VDcEvents v where v.id.host = ? order by v.id.clock desc";
 			Query query = session.createQuery(sql);
 			query.setParameter(0, DcHost);
-			List<DcEvents> eventsList = query.list();
-
+			if (start == null)
+				start = 0;
+			if (limit == null) {
+				limit = 15;
+				query.setMaxResults(limit);
+			} else if (limit == -1) {
+			} else {
+				query.setMaxResults(limit);
+			}
+			query.setFirstResult(start);
+			List<VDcEvents> eventsList = query.list();
+			// 更新门禁的通知状态
+			String sql2 = "update ZHostConfig set notice = 0 where host = ?";
+			Query query2 = session.createQuery(sql2);
+			query2.setParameter(0, DcHost);
+			query2.executeUpdate();
+			List<VDcEventsId> list = new ArrayList<>();
+			for (VDcEvents v : eventsList) {
+				list.add(v.getId());
+			}
 			ts.commit();
-			HibernateSessionFactory.closeSession();
-			return eventsList;
+			return list;
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public Long getDCEventsCount(String DcHost) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select count(id) from ZDcEvents where host = ?";
+			Query query = session.createQuery(sql);
+			query.setParameter(0, DcHost);
+			query.setMaxResults(1);
+			Long count = (Long) query.uniqueResult();
+			return count;
+		} catch (Exception e) {
+			return 0L;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<VDcEventsId> readDCEvents() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Transaction ts = session.beginTransaction();
+			String sql1 = "from VDcEvents v where v.id.isRead=0 order by v.id.host";
+			Query query1 = session.createQuery(sql1);
+			List<VDcEvents> list = query1.list();
+			List<VDcEventsId> list2 = new ArrayList<>();
+			if (list != null && list.size() > 0) {
+				for (VDcEvents v : list) {
+					String sql2 = "update ZHostConfig set notice = 1 where host=?";
+					Query query2 = session.createQuery(sql2);
+					query2.setParameter(0, v.getId().getHost());
+					query2.executeUpdate();
+					list2.add(v.getId());
+				}
+				String sql3 = "update ZDcEvents set isRead = 1 where isRead = 0";
+				Query query3 = session.createQuery(sql3);
+				query3.executeUpdate();
+			}
+			ts.commit();
+			return list2;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<Object[]> getJFError() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select count(*),groupname from v_last_data_jf where name = 'is_device_online' and value = 'ERROR' and host!='192.168.116.253' group by groupname order by groupname";
+			SQLQuery query = session.createSQLQuery(sql);
+			List<Object[]> list = query.list();
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public String getNVRIP(String ipcIP) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select nvr_ip from z_nvr_ipc where ipc_ip=?";
+			SQLQuery query = session.createSQLQuery(sql);
+			query.setParameter(0, ipcIP);
+			String nvrIP = (String) query.uniqueResult();
+			return nvrIP;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public String getIPCIpByName(String ipcName) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select ipc_ip from z_nvr_ipc where ipc_name=?";
+			SQLQuery query = session.createSQLQuery(sql);
+			query.setParameter(0, ipcName);
+			String ipcIP = (String) query.uniqueResult();
+			return ipcIP;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public Object[] getHKJFByIp(String host) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select groupname,type from v_last_data_jf where host=?";
+			SQLQuery query = session.createSQLQuery(sql);
+			query.setParameter(0, host);
+			Object[] o = (Object[]) query.uniqueResult();
+			return o;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<Object[]> getHKAlarmInfo() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select groupname,type from v_last_data_jf where name='is_device_online' and value = 'ERROR' order by clock desc";
+			SQLQuery query = session.createSQLQuery(sql);
+			List<Object[]> o = (List<Object[]>) query.list();
+			return o;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<VItemValueId> getHostList(String type, Integer start,
+			Integer limit) {
+		Map<String, Object> session1 = ActionContext.getContext().getSession();
+		String groupName = (String) session1.get("groupName");
+		// String groupName = "南开区委";
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Query query = null;
+			String sql = "";
+			if (groupName != null) {
+				sql = "from VItemValue where id.type = ? and id.groupname like ? ";
+				query = session.createQuery(sql);
+				query.setParameter(0, type);
+				query.setParameter(1, "%" + groupName + "%");
+				start = 0;
+			} else {
+				sql = "from VItemValue where id.type = ?";
+				query = session.createQuery(sql);
+				query.setParameter(0, type);
+			}
+			query.setParameter(0, type);
+			if (start == null)
+				start = 0;
+			if (limit == null) {
+				limit = 15;
+				query.setMaxResults(limit);
+			} else if (limit == -1) {
+			} else {
+				query.setMaxResults(limit);
+			}
+			query.setFirstResult(start);
+			List<VItemValueId> list = new ArrayList<>();
+			List<VItemValue> list2 = query.list();
+			for (VItemValue v : list2) {
+				v.getId().setGroupname(
+						v.getId().getGroupname().replace("JF-", ""));
+				list.add(v.getId());
+			}
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
 		}
 	}
 }

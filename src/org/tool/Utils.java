@@ -1,124 +1,17 @@
 package org.tool;
 
-import java.util.List;
-import java.util.Map;
-
-import org.dao.AlarmTabDao;
-import org.dao.EventsDao;
-import org.dao.FunctionsDao;
 import org.dao.HostDao;
 import org.dao.ItemsDao;
-import org.dao.ServicesDao;
-import org.dao.ServicesLinksDao;
-import org.dao.imp.AlarmTabDaoImp;
-import org.dao.imp.EventsDaoImp;
-import org.dao.imp.FunctionsDaoImp;
 import org.dao.imp.HostDaoImp;
 import org.dao.imp.ItemsDaoImp;
-import org.dao.imp.ServicesDaoImp;
-import org.dao.imp.ServicesLinksDaoImp;
-import org.model.AlarmTab;
 import org.model.Functions;
 import org.model.Hosts;
 import org.model.Items;
-import org.model.Services;
-import org.model.ServicesLinks;
 
 public class Utils {
 	private Integer Jan = 0, Feb = 0, Mar = 0, Apr = 0, May = 0, Jun = 0,
 			Jul = 0, Aug = 0, Sep = 0, Oct = 0, Dec = 0, Nov = 0;
 
-	/**
-	 * 得到当前设备每个月的故障统计数
-	 */
-	public void getFailureMap(Long hostid) {
-		EventsDao eDao = new EventsDaoImp();
-		List<Map<String, String>> list = eDao.getFailEventsByHostId(hostid);
-		for (Map<String, String> map : list) {
-			String clock = ChangeTime.TimeStamp2Date(map.get("clock"), "MM");
-			switch (clock) {
-			case "01":
-				Jan++;
-				break;
-			case "02":
-				Feb++;
-				break;
-			case "03":
-				Mar++;
-				break;
-			case "04":
-				Apr++;
-				break;
-			case "05":
-				May++;
-				break;
-			case "06":
-				Jun++;
-				break;
-			case "07":
-				Jul++;
-				break;
-			case "08":
-				Aug++;
-				break;
-			case "09":
-				Sep++;
-				break;
-			case "10":
-				Oct++;
-				break;
-			case "11":
-				Nov++;
-				break;
-			case "12":
-				Dec++;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	/**
-	 * 根据服务id找到相应设备，找到一级服务下级的所有设备，但是只需要返回任意一台设备即可
-	 */
-	public static Hosts getHostsByServiceId(Long serviceid) {
-		ServicesLinksDao slDao = new ServicesLinksDaoImp();
-		ServicesDao sDao = new ServicesDaoImp();
-		List<ServicesLinks> hostlist = slDao.getDownServices(serviceid);
-		for (ServicesLinks host : hostlist) {// 遍历机房内所有主机hostlist
-			// System.out.println(host.getLinkid());
-			List<ServicesLinks> parmList = slDao.getDownServices(host
-					.getServicedownid());
-			// 输出上层服务ID
-			System.out.println("serviceupid:" + host.getServiceupid());
-			for (ServicesLinks parm : parmList) {// 遍历主机属性parmlist
-				// 输出上层服务ID
-				System.out.println("serviceupid:" + parm.getServiceupid());
-				Services s = sDao.getServicesById(parm.getServicedownid());
-
-				System.out.println(s.getName());
-				Long triggerId = null;
-				Services s1 = new Services();
-				if (s.getName().contains("海康摄像头")) {// 如果包含字段海康摄像头则再进一步进行遍历
-					List<ServicesLinks> HKIPCList = slDao.getDownServices(s
-							.getServiceid());
-					for (ServicesLinks HKIPCparm : HKIPCList) {// 获取海康摄像头下的属性，也就是下属服务
-						s1 = sDao
-								.getServicesById((HKIPCparm.getServicedownid()));
-						triggerId = s1.getTriggerid();
-					}
-				} else {
-					triggerId = s.getTriggerid();
-				}
-				if (triggerId != null) {
-					// 这是从triggerid得到hostid,找到设备即可返回
-					Hosts h = functionToHost(triggerId);
-					return h;
-				}
-			}
-		}
-		return null;
-	}
 	/**
 	 * 将时间格式规范化,如2016/09/30 14:28:58 转成2016-09-30 14:28:58
 	 */
@@ -154,18 +47,53 @@ public class Utils {
 //		}
 //	}
 
-	private static Hosts functionToHost(Long triggerid) {// trigger---->host
-		FunctionsDao fDao = new FunctionsDaoImp();
-		ItemsDao iDao = new ItemsDaoImp();
-		HostDao hDao = new HostDaoImp();
-
-		Functions f = fDao.getFunctionByTrigger(triggerid);
-		Items i = iDao.getItemByItemid(f.getItemid());
-		Hosts h = hDao.getHostByHostid(i.getHostid());
-
-		return h;
+	/**
+	 * 将字节数组转换成十六进制字符串
+	 * @param byteArray
+	 * @return
+	 * @author A客
+	 */
+	public static String byteArrayToHexStr(byte[] byteArray) {
+		if (byteArray == null) {
+			return null;
+		}
+		char[] hexArray = "0123456789ABCDEF".toCharArray();
+		char[] hexChars = new char[byteArray.length * 2];
+		for (int j = 0; j < byteArray.length; j++) {
+			int v = byteArray[j] & 0xFF;
+			hexChars[j * 2] = hexArray[v >>> 4];
+			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+		}
+		return new String(hexChars);
 	}
-
+	/**
+	 * @param str
+	 * @return
+	 * @author A客
+	 */
+	public static byte[] hexStrToByteArray(String str) {
+		if (str == null) {
+			return null;
+		}
+		if (str.length() == 0) {
+			return new byte[0];
+		}
+		byte[] byteArray = new byte[str.length() / 2];
+		for (int i = 0; i < byteArray.length; i++) {
+			String subStr = str.substring(2 * i, 2 * i + 2);
+			byteArray[i] = ((byte) Integer.parseInt(subStr, 16));
+		}
+		return byteArray;
+	}
+	/**
+	 * 生成6位随机数
+	 * 
+	 * @return
+	 */
+	public static String ran6() {
+		Double a = 100000 + Math.random() * 899999;
+		return "" + a.intValue();
+	}
 	public Integer getJan() {
 		return Jan;
 	}

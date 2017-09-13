@@ -10,6 +10,13 @@ public class ChangeTime {
 //				.format(new java.util.Date(timestamp));
 //		return date;
 //	}
+	/**
+	 * 取得当前年月日
+	 */
+	public static Integer currentDate() {
+		return Integer.parseInt(new SimpleDateFormat("YYYYMMdd")
+				.format(new Date()));
+	}
 	/** 
      * 日期格式字符串转换成时间戳 
      * @param date 字符串日期 

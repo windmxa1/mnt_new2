@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>demo.html</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+<script type="text/javascript" src="jquery.min.js"></script>
+<script>
+	$(function() {
+		var token = "";
+		var user = {
+			username : "admin",
+			password : "admin"
+		};
+		$.ajax({
+			type : "post",
+			url : "login",
+			data : user,
+			success : function(data) {
+				token = data.token;
+				alert("token:" + token);
+			},
+			error : function(data) {
+				alert("error");
+			}
+		});
+		$("#btn1").click(function() {
+			var formData = new FormData(document.getElementById("photoForm"));
+			$.ajax({
+				type : "post",
+				url : "updateHead",
+				data : formData,
+				success : function(data) {
+					console.log('ok');
+				},
+				error : function(data) {
+					console.log('error');
+				}
+			});
+		});
+	});
+</script>
+</head>
+
+<body>
+	<input type="button" id="btn1">
+</body>
+</html>

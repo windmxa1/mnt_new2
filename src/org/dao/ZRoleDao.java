@@ -6,10 +6,10 @@ import org.model.ZRole;
 
 public interface ZRoleDao {
 	/**
-	 * 添加角色
+	 * 添加角色，并添加角色拥有的权限
 	 * @return 
 	 */
-	public boolean addRole(String role);
+	public boolean addRole(String role,int[] authorityId);
 	/**
 	 * 检测角色名是否可用
 	 * @param role
@@ -17,7 +17,7 @@ public interface ZRoleDao {
 	 */
 	public boolean checkRole(String role);
 	/**
-	 * 删除角色
+	 * 删除角色,同时删除角色权限关联，用户角色关联
 	 * @return
 	 */
 	public boolean deleteRole(int id);
@@ -26,6 +26,11 @@ public interface ZRoleDao {
 	 * @return
 	 */
 	public List<ZRole> getRoleList();
+	/**
+	 * 获取角色列表
+	 * @return
+	 */
+	public List<String> getRoleNameList();
 	/**
 	 * 获取角色最大的id
 	 * @return
@@ -36,7 +41,7 @@ public interface ZRoleDao {
 	 * @param role
 	 * @return
 	 */
-	public int getIdByRole(String role);
+	public Integer getIdByRole(String role);
 	/**
 	 * 通过id获取role
 	 * @param roleId

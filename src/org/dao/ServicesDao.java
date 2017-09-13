@@ -3,12 +3,13 @@ package org.dao;
 import java.util.List;
 
 import org.model.Services;
+import org.view.VServicesId;
 
 public interface ServicesDao {
 	/**
 	 * 找出第一级服务即代表机房的项
 	 */
-	public List<Services> getServicesGroup();
+	public List<VServicesId> getServicesGroup();
 	/**
 	 * 通过服务id找到对应的服务
 	 */

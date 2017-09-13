@@ -1,5 +1,7 @@
 package org.model;
 
+import java.util.List;
+
 /**
  * ZRole entity. @author MyEclipse Persistence Tools
  */

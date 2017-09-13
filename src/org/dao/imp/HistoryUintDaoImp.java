@@ -20,14 +20,12 @@ public class HistoryUintDaoImp implements HistoryUintDao{
 			query.setMaxResults(1);
 			
 			HistoryUint historyUint = (HistoryUint) query.uniqueResult();
-			HibernateSessionFactory.closeSession();
-			if(historyUint!=null)
 				return historyUint;
-			else
-				return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 

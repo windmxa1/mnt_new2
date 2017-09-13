@@ -29,11 +29,12 @@ public class ZBoardDaoImp implements ZBoardDao {
 			session.save(b);
 
 			ts.commit();
-			HibernateSessionFactory.closeSession();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -57,11 +58,12 @@ public class ZBoardDaoImp implements ZBoardDao {
 			sqlQuery.executeUpdate();
 			
 			ts.commit();
-			HibernateSessionFactory.closeSession();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -86,11 +88,12 @@ public class ZBoardDaoImp implements ZBoardDao {
 			for (VZboardZuser b : li) {
 				list.add(b.getId());
 			}
-			HibernateSessionFactory.closeSession();
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -102,11 +105,12 @@ public class ZBoardDaoImp implements ZBoardDao {
 			Query query = session.createQuery(sql);
 			query.setMaxResults(1);
 			Long count = (Long) query.uniqueResult();
-			HibernateSessionFactory.closeSession();
 			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return (long) -1;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 	

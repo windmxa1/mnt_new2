@@ -37,7 +37,6 @@ public class ZMessDaoImp implements ZMessDao {
 				sqlQuery.setParameter(3, limit);
 				sqlQuery.addEntity(ZMessage.class);
 				List<ZMessage> list = sqlQuery.list();
-				HibernateSessionFactory.closeSession();
 				return list;
 			} else {
 				sql = "select m.* from z_message m where sender_id = ?  and receiver_id = ?  and receive_state=0 order by time desc limit ?,?";
@@ -48,13 +47,13 @@ public class ZMessDaoImp implements ZMessDao {
 				sqlQuery.setParameter(3, limit);
 				sqlQuery.addEntity(ZMessage.class);
 				List<ZMessage> list = sqlQuery.list();
-				HibernateSessionFactory.closeSession();
 				return list;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			HibernateSessionFactory.closeSession();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -81,12 +80,12 @@ public class ZMessDaoImp implements ZMessDao {
 			for (VMessage v : list) {
 				list2.add(v.getId());
 			}
-			HibernateSessionFactory.closeSession();
 			return list2;
 		} catch (Exception e) {
 			e.printStackTrace();
-			HibernateSessionFactory.closeSession();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 
@@ -132,12 +131,12 @@ public class ZMessDaoImp implements ZMessDao {
 				count = (Integer) session.save(msg);
 			}
 			ts.commit();
-			HibernateSessionFactory.closeSession();
 			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
-			HibernateSessionFactory.closeSession();
 			return -1;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 
 	}
@@ -150,12 +149,12 @@ public class ZMessDaoImp implements ZMessDao {
 			query.setParameter(0, id);
 			query.setMaxResults(1);
 			ZMessage msg = (ZMessage) query.uniqueResult();
-			HibernateSessionFactory.closeSession();
 			return msg;
 		} catch (Exception e) {
 			e.printStackTrace();
-			HibernateSessionFactory.closeSession();
 			return null;
+		}finally{
+			HibernateSessionFactory.closeSession();
 		}
 	}
 

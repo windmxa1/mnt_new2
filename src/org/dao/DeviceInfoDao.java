@@ -3,19 +3,48 @@ package org.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.model.DcEvents;
+import org.model.ZDcEvents;
+import org.view.VDcEvents;
+import org.view.VDcEventsId;
+import org.view.VItemValueId;
 
 public interface DeviceInfoDao {
 	/**
-	 *  通过同一类型的设备列表获取设备信息：
+	 * 获取设备相关信息
 	 */
-	public List<Map<String, String>> getDeviceInfo(List<Object[]> someTypeList,String group); 
+	public List<VItemValueId> getHostList(String type,Integer start,Integer limit);
 	/**
-	 * 获取门禁信息列表
+	 * 获取摄像头IP地址
 	 */
-	public List<DcEvents> getDCEvents(String DcHost); //
+	public String getIPCIpByName(String name);
 	/**
-	 * 获取该设备的信息列表
+	 * 获取门禁开关信息列表、同时更新门禁的通知状态
 	 */
-	public Map<String, String> getInfoMap(Long hostid,String group) ;
+	public List<VDcEventsId> getDCEvents(String DcHost, Integer start, Integer limit); 
+	/**
+	 * 读取最新的刷卡消息并更新已读状态，同时还要更新HostConfig表里面门禁的消息通知状态
+	 */
+	public List<VDcEventsId> readDCEvents(); 
+	/**
+	 * 获取门禁开关信息总数
+	 */
+	public Long getDCEventsCount(String DcHost); //
+
+	/**
+	 * 获取各机房的故障数目和机房名
+	 */
+	public List<Object[]> getJFError();
+	/**
+	 * 获取摄像头对应的录像机IP
+	 */
+	public String getNVRIP(String ipcIP);
+	/**
+	 * 根据IP获取设备机房信息
+	 */
+	public Object[] getHKJFByIp(String host);
+	/**
+	 * 获取海康设备异常设备与机房
+	 */
+	public List<Object[]> getHKAlarmInfo();
+	
 }

@@ -23,12 +23,9 @@
 	<mapping resource="speed/model/Class.hbm.xml" />
 	<mapping resource="speed/model/Record.hbm.xml" />
 	<mapping resource="speed/model/Sensors.hbm.xml" />
-	<mapping resource="speed/model/Sysmsg.hbm.xml" />
-	<mapping resource="speed/model/Tel.hbm.xml" />
-	<mapping resource="speed/model/Unit.hbm.xml" />
-	<mapping resource="speed/model/User.hbm.xml" />
-	<mapping resource="speed/model/Video.hbm.xml" />
 	<mapping resource="speed/view/VSensors.hbm.xml" />
+	<mapping resource="speed/view/VRecord.hbm.xml" />
+	<mapping resource="speed/model/SensorConfig.hbm.xml" />
 
 </session-factory>
 

@@ -9,7 +9,7 @@ public interface ItemsDao {
 	/**
 	 * 通过设备id获取指定ip地址的全部item项
 	 */
-	public List getItemsByHostid(Long hostId);
+	public List<Items> getItemsByHostid(Long hostId);
 	/**
 	 * 通过监控项ID找到单个items
 	 */

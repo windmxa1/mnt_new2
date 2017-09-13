@@ -16,10 +16,14 @@ public class VSensorsId implements java.io.Serializable {
 	private Double overresult;
 	private Double lowerresult;
 	private Double sensorvalue;
-	private Integer wet=0;
+	private String location;
+	private Integer status;
+	private String message;
+	private Integer available;
 	private Double temp=0d;
-	private String state="";
-
+	private Integer wet=0;
+	private Integer state=0;
+	private String runModel="";
 	// Constructors
 
 	/** default constructor */
@@ -35,7 +39,8 @@ public class VSensorsId implements java.io.Serializable {
 	/** full constructor */
 	public VSensorsId(Integer no, String ip, Short type, Short unit,
 			String displayname, Double overresult, Double lowerresult,
-			Double sensorvalue) {
+			Double sensorvalue, String location, Integer status,
+			String message, Integer available) {
 		this.no = no;
 		this.ip = ip;
 		this.type = type;
@@ -44,6 +49,10 @@ public class VSensorsId implements java.io.Serializable {
 		this.overresult = overresult;
 		this.lowerresult = lowerresult;
 		this.sensorvalue = sensorvalue;
+		this.location = location;
+		this.status = status;
+		this.message = message;
+		this.available = available;
 	}
 
 	// Property accessors
@@ -112,12 +121,36 @@ public class VSensorsId implements java.io.Serializable {
 		this.sensorvalue = sensorvalue;
 	}
 
-	public Integer getWet() {
-		return wet;
+	public String getLocation() {
+		return this.location;
 	}
 
-	public void setWet(Integer wet) {
-		this.wet = wet;
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public Integer getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public String getMessage() {
+		return this.message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public Integer getAvailable() {
+		return this.available;
+	}
+
+	public void setAvailable(Integer available) {
+		this.available = available;
 	}
 
 	public Double getTemp() {
@@ -128,12 +161,30 @@ public class VSensorsId implements java.io.Serializable {
 		this.temp = temp;
 	}
 
-	public String getState() {
-		return state;
+	public Integer getWet() {
+		return wet;
 	}
 
-	public void setState(String state) {
+	public void setWet(Integer wet) {
+		this.wet = wet;
+	}
+
+	public Integer getState() {
+		return state;
+	}
+	/**
+	 * 设置空调运行状态，默认为0，代表关闭
+	 */
+	public void setState(Integer state) {
 		this.state = state;
+	}
+
+	public String getRunModel() {
+		return runModel;
+	}
+
+	public void setRunModel(String runModel) {
+		this.runModel = runModel;
 	}
 
 	public boolean equals(Object other) {
@@ -172,7 +223,21 @@ public class VSensorsId implements java.io.Serializable {
 				&& ((this.getSensorvalue() == castOther.getSensorvalue()) || (this
 						.getSensorvalue() != null
 						&& castOther.getSensorvalue() != null && this
-						.getSensorvalue().equals(castOther.getSensorvalue())));
+						.getSensorvalue().equals(castOther.getSensorvalue())))
+				&& ((this.getLocation() == castOther.getLocation()) || (this
+						.getLocation() != null
+						&& castOther.getLocation() != null && this
+						.getLocation().equals(castOther.getLocation())))
+				&& ((this.getStatus() == castOther.getStatus()) || (this
+						.getStatus() != null && castOther.getStatus() != null && this
+						.getStatus().equals(castOther.getStatus())))
+				&& ((this.getMessage() == castOther.getMessage()) || (this
+						.getMessage() != null && castOther.getMessage() != null && this
+						.getMessage().equals(castOther.getMessage())))
+				&& ((this.getAvailable() == castOther.getAvailable()) || (this
+						.getAvailable() != null
+						&& castOther.getAvailable() != null && this
+						.getAvailable().equals(castOther.getAvailable())));
 	}
 
 	public int hashCode() {
@@ -200,6 +265,14 @@ public class VSensorsId implements java.io.Serializable {
 				* result
 				+ (getSensorvalue() == null ? 0 : this.getSensorvalue()
 						.hashCode());
+		result = 37 * result
+				+ (getLocation() == null ? 0 : this.getLocation().hashCode());
+		result = 37 * result
+				+ (getStatus() == null ? 0 : this.getStatus().hashCode());
+		result = 37 * result
+				+ (getMessage() == null ? 0 : this.getMessage().hashCode());
+		result = 37 * result
+				+ (getAvailable() == null ? 0 : this.getAvailable().hashCode());
 		return result;
 	}
 

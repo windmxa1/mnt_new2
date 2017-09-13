@@ -14,13 +14,13 @@
             <column name="SensorIndex" not-null="true" />
         </property>
         <property name="sensorValue" type="java.lang.Double">
-            <column name="SensorValue" precision="7" />
+            <column name="SensorValue" precision="11" />
         </property>
         <property name="sensorOverValue" type="java.lang.Double">
-            <column name="SensorOverValue" precision="7" />
+            <column name="SensorOverValue" precision="11" />
         </property>
         <property name="sensorLowerValue" type="java.lang.Double">
-            <column name="SensorLowerValue" precision="7" />
+            <column name="SensorLowerValue" precision="11" />
         </property>
         <property name="sensorOverAction" type="java.lang.Short">
             <column name="SensorOverAction" />

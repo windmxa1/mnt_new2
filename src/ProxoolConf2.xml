@@ -5,7 +5,7 @@
 	<proxool>
 		<alias>proxoolPool2</alias>
 		<!--proxool只能管理由自己产生的连接 -->
-		<driver-url>jdbc:mysql://192.168.103.254:3306/speedmonitor?characterEncoding=UTF-8&amp;autoReconnect=true
+		<driver-url>jdbc:mysql://119.23.67.238:3306/speedmonitor?characterEncoding=UTF-8&amp;autoReconnect=true
 		</driver-url>
 		<driver-class>com.mysql.jdbc.Driver</driver-class>
 		<driver-properties>
@@ -13,11 +13,11 @@
 			<property name="password" value="admin123" />
 		</driver-properties>
 		<!-- proxool自动侦察各个连接状态的时间间隔(毫秒),侦察到空闲的连接就马上回收,超时的销毁 -->
-		<house-keeping-sleep-time>180000</house-keeping-sleep-time>
+		<house-keeping-sleep-time>181000</house-keeping-sleep-time>
 		<!--如果发现了空闲的数据库连接.house keeper 将会用这个语句来测试.这个语句最好非常快的被执行. 如果没有定义,测试过程将会被忽略 -->
 		<house-keeping-test-sql>select CURRENT_DATE</house-keeping-test-sql>
 		<!--一个活动连接最大活动时间,默认为5分钟 -->
-		<maximum-active-time>3600000</maximum-active-time>
+		<maximum-active-time>360000</maximum-active-time>
 		<!-- 指因未有空闲连接可以分配而在队列中等候的最大请求数,超过这个请求数的用户连接就不会被接受 -->
 		<maximum-new-connections>15</maximum-new-connections>
 		<!-- 最少保持的空闲连接数 -->

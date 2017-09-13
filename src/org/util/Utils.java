@@ -133,6 +133,14 @@ public class Utils {
 		}
 	}
 
+	public static Long parseLong(String a) {
+		try {
+			return Long.parseLong((String) a);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	/**
 	 * 批量删除文件
 	 */
