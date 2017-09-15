@@ -100,4 +100,23 @@ public class ZHostConfigDaoImp implements ZHostConfigDao {
 			HibernateSessionFactory.closeSession();
 		}
 	}
+
+	@Override
+	public boolean updateNotice(String[] hostList) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Transaction ts = session.beginTransaction();
+			String sql = "update ZHostConfig hc set hc.notice=1 where hc.host in (:hostList) ";
+			SQLQuery query = session.createSQLQuery(sql);
+			query.setParameterList("hostList", hostList);
+			query.executeUpdate();
+			ts.commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
 }

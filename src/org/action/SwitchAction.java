@@ -125,6 +125,7 @@ public class SwitchAction extends ActionSupport {
 				return SUCCESS;
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 			result = R.getJson(0, "操作失败,请重试", "");
 			return SUCCESS;
 		}

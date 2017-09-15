@@ -2,10 +2,17 @@ package org.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
+import org.apache.struts2.ServletActionContext;
+import org.apache.taglibs.standard.tag.rt.core.OutTag;
 import org.dao.DeviceInfoDao;
 import org.dao.GroupsDao;
 import org.dao.ZConnectCtlDao;
@@ -55,7 +62,7 @@ public class DCAction extends ActionSupport { // 门禁
 	}
 
 	public String getDCInfo() throws Exception {
-//		Long time = System.currentTimeMillis();
+		// Long time = System.currentTimeMillis();
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
 		List<VItemValueId> list = dInfoDao.getHostList("门禁", start, limit);
 		List<Map<String, String>> li = new ArrayList<>();
@@ -85,7 +92,7 @@ public class DCAction extends ActionSupport { // 门禁
 		data.put("total", gDao.getHostCountByGroupid(8L));
 		data.put("list", li);
 		result = R.getJson(1, "", data);
-//		System.out.println(System.currentTimeMillis() - time);
+		// System.out.println(System.currentTimeMillis() - time);
 		return SUCCESS;
 	}
 
@@ -163,7 +170,35 @@ public class DCAction extends ActionSupport { // 门禁
 	}
 
 	// 开门提示
-	public String doorNotice() {
+	public String doorNotice() throws Exception {
+		DeviceInfoDao dDao = new DeviceDaoImp();
+		List<Object[]> list = dDao.getUnReadDCEvents();
+		// Set<String> hostSet = new HashSet<>();
+		// hostSet.addAll(Arrays.asList(list.get(3)));
+		if (list == null || list.size() == 0) {
+			result = R.getJson(0, "", "");
+			return SUCCESS;
+		}
+		String out = "";
+		int i = 0;
+		for (Object[] s : list) {
+			if (i == 0) {
+				out = out + ("" + s[0]).replace("JF-", "") + " " + s[1] + " "
+						+ s[2];
+			} else {
+				out = out + "|" + ("" + s[0]).replace("JF-", "") + " " + s[1]
+						+ " " + s[2];
+			}
+			i = 1;
+		}
+		data = new HashMap<>();
+		data.put("info", out);
+		result = R.getJson(1, "", data);
+		return SUCCESS;
+	}
+
+	// 开门提示
+	public String doorNotice1() {
 		DeviceInfoDao dDao = new DeviceDaoImp();
 		long startTime = System.currentTimeMillis() / 1000;
 		Map<String, Object> session = ActionContext.getContext().getSession();
@@ -224,20 +259,6 @@ public class DCAction extends ActionSupport { // 门禁
 
 		return SUCCESS;
 	}
-
-	// public String execute() throws Exception {
-	//
-	// GroupsDao gDao = new GroupsDaoImp();
-	// // 找出所有主机
-	// List<Object[]> li = gDao.getHostListByGroupid((long) 8);
-	//
-	// DeviceInfoDao dDao = new DeviceDaoImp();
-	// // 找出所有与主机对应的设备信息
-	// List<Map<String, String>> list = dDao.getDeviceInfo(li, "8");
-	// result = list;
-	//
-	// return SUCCESS;
-	// }
 
 	public String getCtl() {
 		return ctl;

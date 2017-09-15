@@ -212,50 +212,10 @@ public class ZUserAction extends ActionSupport {
 		session.clear();
 		session1.invalidate();
 		result = R.getJson(1, "", "");
+		System.out.println("退出登录");
 		return SUCCESS;
 	}
 
-	// public String test() {
-	// try {
-	// String str = "sh /home/dzj/cps/arming_script/tttsj.sh";
-	// Runtime.getRuntime().exec(str);
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// result = R.getJson(0, "操作失败，请重试", "");
-	// return SUCCESS;
-	// }
-	// return SUCCESS;
-	// }
-	// public String test2() {
-	// try {
-	// String str = "sh /home/dzj/cps/arming_script/tttsj.sh 1,2,3 1,2,4,5";
-	// Runtime.getRuntime().exec(str);
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// result = R.getJson(0, "操作失败，请重试", "");
-	// return SUCCESS;
-	// }
-	// return SUCCESS;
-	// }
-	//
-	// public String test1() {
-	// try {
-	// String str = "sh /home/dzj/cps/arming_script/tttsj.sh 1,2,3 1,2,4,5";
-	// Process p = Runtime.getRuntime().exec(str);
-	// BufferedReader in = new BufferedReader(new InputStreamReader(
-	// p.getInputStream()));
-	// String s = "";
-	// while ((s = in.readLine()) != null) {
-	// System.out.println(s);
-	// }
-	// System.out.println("finished...");
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// result = R.getJson(0, "操作失败，请重试", "");
-	// return SUCCESS;
-	// }
-	// return SUCCESS;
-	// }
 
 	/**
 	 * 更新自动布防方案
@@ -320,19 +280,19 @@ public class ZUserAction extends ActionSupport {
 	/**
 	 * 判断当前时间与最后操作时间是否间隔超过5分钟
 	 */
-	public String outOfTime() {
+	public String outOfTime() throws Exception{
 		Long clock = System.currentTimeMillis() / 1000;
 		ZOperationDao oDao = new ZOperationDaoImp();
 		HttpServletRequest request = ServletActionContext.getRequest();
 		Map<String, Object> session = ActionContext.getContext().getSession();
-		ZUser u = (ZUser) request.getSession().getAttribute("user");
+		ZUser u = (ZUser) session.get("user");
 		if (Constans.isAutoLogout
 				&& !oDao.checkOpeartion(u.getId(), clock, Constans.interval)) {// 超过5分钟则提示该信息
 			HttpSession session1 = request.getSession();
 			session.clear();
 			session1.invalidate();
 			result = R.getJson(-999, "登录信息已过期，请重新登录", "");
-			return Action.ERROR;
+			return SUCCESS;
 		}
 		result = R.getJson(1, "", "");
 		return SUCCESS;

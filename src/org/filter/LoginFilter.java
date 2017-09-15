@@ -19,8 +19,8 @@ public class LoginFilter extends AbstractInterceptor {
 	@Override
 	public String intercept(ActionInvocation invocation) throws Exception {
 		String actionName = invocation.getInvocationContext().getName();
-		// System.out.println(actionName);
 		Map<String, Object> session = ActionContext.getContext().getSession();
+//		System.out.println(session.get("user"));
 		if (actionName.equals("login")) {// 登录不做拦截，但要做记录，所以需要进入拦截器
 			return invocation.invoke();
 		}

@@ -24,7 +24,11 @@ public interface DeviceInfoDao {
 	/**
 	 * 读取最新的刷卡消息并更新已读状态，同时还要更新HostConfig表里面门禁的消息通知状态
 	 */
-	public List<VDcEventsId> readDCEvents(); 
+	public List<VDcEventsId> readDCEvents();
+	/**
+	 * 获取当前未处理的门禁事件
+	 */
+	public List<Object[]> getUnReadDCEvents(); 
 	/**
 	 * 获取门禁开关信息总数
 	 */

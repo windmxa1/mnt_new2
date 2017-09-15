@@ -1,6 +1,7 @@
 package org.dao.imp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,12 @@ public class DeviceDaoImp implements DeviceInfoDao {
 			Query query2 = session.createQuery(sql2);
 			query2.setParameter(0, DcHost);
 			query2.executeUpdate();
+			// 修改门禁事件的状态为已读
+			String sql3 = "update ZDcEvents set isRead = 1 where host = ?";
+			Query query3 = session.createQuery(sql3);
+			query3.setParameter(0, DcHost);
+			query3.executeUpdate();
+			
 			List<VDcEventsId> list = new ArrayList<>();
 			for (VDcEvents v : eventsList) {
 				list.add(v.getId());
@@ -98,6 +105,34 @@ public class DeviceDaoImp implements DeviceInfoDao {
 			}
 			ts.commit();
 			return list2;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<Object[]> getUnReadDCEvents() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Transaction ts = session.beginTransaction();
+			String sql1 = "select id.groupname,id.cardid,id.cardUser from VDcEvents v where v.id.isRead=0 order by v.id.host";
+			Query query1 = session.createQuery(sql1);
+			List<Object[]> list = query1.list();
+			String sql2 = "select host from ZDcEvents where isRead=0 order by host";
+			Query query2 = session.createQuery(sql2);
+			List<String> list2 = query2.list();
+			
+			if (list2.size() != 0) {
+				String sql3 = "update ZHostConfig set notice = 1 where host in (:hostList)";
+				Query query3 = session.createQuery(sql3);
+				query3.setParameterList("hostList", list2.toArray(new String[list2.size()]));
+				query3.executeUpdate();
+				ts.commit();
+			}
+			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
