@@ -40,17 +40,12 @@ public class DeviceDaoImp implements DeviceInfoDao {
 			}
 			query.setFirstResult(start);
 			List<VDcEvents> eventsList = query.list();
-			// 更新门禁的通知状态
-			String sql2 = "update ZHostConfig set notice = 0 where host = ?";
-			Query query2 = session.createQuery(sql2);
-			query2.setParameter(0, DcHost);
-			query2.executeUpdate();
 			// 修改门禁事件的状态为已读
 			String sql3 = "update ZDcEvents set isRead = 1 where host = ?";
 			Query query3 = session.createQuery(sql3);
 			query3.setParameter(0, DcHost);
 			query3.executeUpdate();
-			
+
 			List<VDcEventsId> list = new ArrayList<>();
 			for (VDcEvents v : eventsList) {
 				list.add(v.getId());
@@ -114,25 +109,17 @@ public class DeviceDaoImp implements DeviceInfoDao {
 	}
 
 	@Override
-	public List<Object[]> getUnReadDCEvents() {
+	public List<VDcEventsId> getUnReadDCEvents() {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			Transaction ts = session.beginTransaction();
-			String sql1 = "select id.groupname,id.cardid,id.cardUser from VDcEvents v where v.id.isRead=0 order by v.id.host";
+			String sql1 = "from VDcEvents v where v.id.isRead=0 order by v.id.host";
 			Query query1 = session.createQuery(sql1);
-			List<Object[]> list = query1.list();
-			String sql2 = "select host from ZDcEvents where isRead=0 order by host";
-			Query query2 = session.createQuery(sql2);
-			List<String> list2 = query2.list();
-			
-			if (list2.size() != 0) {
-				String sql3 = "update ZHostConfig set notice = 1 where host in (:hostList)";
-				Query query3 = session.createQuery(sql3);
-				query3.setParameterList("hostList", list2.toArray(new String[list2.size()]));
-				query3.executeUpdate();
-				ts.commit();
+			List<VDcEvents> list = query1.list();
+			List<VDcEventsId> list2 = new ArrayList<>();
+			for (VDcEvents v : list) {
+				list2.add(v.getId());
 			}
-			return list;
+			return list2;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -245,6 +232,42 @@ public class DeviceDaoImp implements DeviceInfoDao {
 				query = session.createQuery(sql);
 				query.setParameter(0, type);
 			}
+			query.setParameter(0, type);
+			if (start == null)
+				start = 0;
+			if (limit == null) {
+				limit = 15;
+				query.setMaxResults(limit);
+			} else if (limit == -1) {
+			} else {
+				query.setMaxResults(limit);
+			}
+			query.setFirstResult(start);
+			List<VItemValueId> list = new ArrayList<>();
+			List<VItemValue> list2 = query.list();
+			for (VItemValue v : list2) {
+				v.getId().setGroupname(
+						v.getId().getGroupname().replace("JF-", ""));
+				list.add(v.getId());
+			}
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<VItemValueId> getHostList1(String type, Integer start,
+			Integer limit) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Query query = null;
+			String sql = "";
+			sql = "from VItemValue where id.type = ?";
+			query = session.createQuery(sql);
 			query.setParameter(0, type);
 			if (start == null)
 				start = 0;

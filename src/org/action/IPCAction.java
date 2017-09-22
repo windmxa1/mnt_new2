@@ -27,7 +27,7 @@ public class IPCAction extends ActionSupport {
 
 	public String getIPCInfo() throws Exception { // 待定：是否有null的判断,参照login
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
-		List<VItemValueId> list = dInfoDao.getHostList("摄像头", start, limit);
+		List<VItemValueId> list = dInfoDao.getHostList1("摄像头", start, limit);
 		List<Map<String, String>> li = new ArrayList<>();
 		for (VItemValueId v : list) {
 			Map<String, String> infoMap = new HashMap<String, String>();
@@ -41,7 +41,7 @@ public class IPCAction extends ActionSupport {
 		}
 		data = new HashMap<>();
 		GroupsDao gDao = new GroupsDaoImp();
-		data.put("total", gDao.getHostCountByGroupid(9L));
+		data.put("total", gDao.getHostCountByGroupid1(9L));
 		data.put("list", li);
 		result = R.getJson(1, "", data);
 		return SUCCESS;

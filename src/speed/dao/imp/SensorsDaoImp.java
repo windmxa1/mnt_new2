@@ -34,7 +34,7 @@ public class SensorsDaoImp implements SensorsDao {
 			String groupName = (String) session1.get("groupName");
 			// String groupName = null;
 			Query query = null;
-//			System.out.println("groupName:"+groupName);
+			// System.out.println("groupName:"+groupName);
 			if (groupName != null) {
 				sql = " from VSensors v where v.id.type=? and v.id.location like ? order by v.id.no desc";
 				query = session.createQuery(sql);
@@ -65,6 +65,56 @@ public class SensorsDaoImp implements SensorsDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		} finally {
+			HibernateSessionFactory2.closeSession();
+		}
+	}
+
+	@Override
+	public List<VSensorsId> getSensorsByType1(Integer start, Integer limit,
+			Short type) {
+		try {
+			Session session = HibernateSessionFactory2.getSession();
+			String sql = " from VSensors v where v.id.type=? order by v.id.no desc";
+			Query query = session.createQuery(sql);
+			query.setParameter(0, type);
+			if (start == null)
+				start = 0;
+			if (limit == null) {
+				limit = 15;
+				query.setMaxResults(limit);
+			} else if (limit == -1) {
+			} else {
+				query.setMaxResults(limit);
+			}
+			query.setFirstResult(start);
+			List<VSensors> list = query.list();
+			List<VSensorsId> list2 = new ArrayList<>();
+			for (VSensors v : list) {
+				list2.add(v.getId());
+			}
+			return list2;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory2.closeSession();
+		}
+	}
+
+	@Override
+	public Long getSensorsByType1Count(Short type) {
+		try {
+			Session session = HibernateSessionFactory2.getSession();
+			String sql = "select count(v.id.no) from VSensors v where v.id.type=?";
+			Query query = session.createQuery(sql);
+			query.setParameter(0, type);
+			query.setMaxResults(1);
+			Long count = (Long) query.uniqueResult();
+			return count;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0L;
 		} finally {
 			HibernateSessionFactory2.closeSession();
 		}

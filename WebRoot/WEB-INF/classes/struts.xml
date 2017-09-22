@@ -21,6 +21,21 @@
 			</result>
 		</global-results>
 	</package>
+	<package name="myFilter" extends="json-default">
+		<interceptors>
+			<interceptor name="myFilter" class="org.filter.MyFilter" />
+			<interceptor-stack name="mydefault">
+				<interceptor-ref name="myFilter"></interceptor-ref>
+				<interceptor-ref name="defaultStack" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="mydefault" />
+		<global-results>
+			<result type="json" name="error">
+				<param name="root">result</param>
+			</result>
+		</global-results>
+	</package>
 
 
 	<package name="sensor" extends="json-default,global" namespace="/">
@@ -67,7 +82,7 @@
 			</result>
 		</action>
 	</package>
-	<package name="map" extends="json-default" namespace="/">
+	<package name="map" extends="json-default,myFilter" namespace="/">
 		<action name="getMapInfo" class="org.action.MapAction" method="getMapInfo">	<!-- 获取机房列表和状态 -->
 			<result type="json" name="success">
 				<param name="root">result</param>
@@ -314,7 +329,7 @@
 		</action>
 	</package>
 
-	<package name="nolog" extends="json-default" namespace="/">
+	<package name="nolog" extends="json-default,myFilter" namespace="/">
 		<action name="getIPCIpByName" class="org.action.IPCAction"
 			method="getIPCIpByName">	<!-- 获取角色名称列表 -->
 			<result type="json" name="success">
@@ -350,6 +365,11 @@
 			</result>
 		</action>
 		<action name="getAlarm" class="org.action.MapAction" method="getAlarm">	<!-- 检查设备异常 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getAlarm1" class="org.action.MapAction" method="getAlarm1">	<!-- 检查设备异常 -->
 			<result type="json" name="success">
 				<param name="root">result</param>
 			</result>

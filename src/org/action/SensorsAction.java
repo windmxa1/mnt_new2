@@ -73,8 +73,8 @@ public class SensorsAction extends ActionSupport {
 	public String getWaterloggingList() {
 		sDao = new SensorsDaoImp();
 		List<VSensorsId> list = sDao
-				.getSensorsByType2(start, limit, (short) 16);
-		Long count = sDao.getSensorsByType2Count((short) 16);
+				.getSensorsByType1(start, limit, (short) 16);
+		Long count = sDao.getSensorsByType1Count((short) 16);
 		data = new HashMap<String, Object>();
 		data.put("total", count);
 		data.put("list", list);
@@ -86,8 +86,8 @@ public class SensorsAction extends ActionSupport {
 	public String getTempList() {
 		sDao = new SensorsDaoImp();
 		List<VSensorsId> list = sDao
-				.getSensorsByType2(start, limit, (short) 48);
-		Long count = sDao.getSensorsByType2Count((short) 48);
+				.getSensorsByType1(start, limit, (short) 48);
+		Long count = sDao.getSensorsByType1Count((short) 48);
 		data = new HashMap<String, Object>();
 		data.put("total", count);
 		data.put("list", list);
@@ -99,8 +99,8 @@ public class SensorsAction extends ActionSupport {
 	public String getWetList() {
 		sDao = new SensorsDaoImp();
 		List<VSensorsId> list = sDao
-				.getSensorsByType2(start, limit, (short) 49);
-		Long count = sDao.getSensorsByType2Count((short) 49);
+				.getSensorsByType1(start, limit, (short) 49);
+		Long count = sDao.getSensorsByType1Count((short) 49);
 		data = new HashMap<String, Object>();
 		data.put("total", count);
 		data.put("list", list);
@@ -112,9 +112,9 @@ public class SensorsAction extends ActionSupport {
 	public String getAirConditionList() {
 		Long time = System.currentTimeMillis();
 		sDao = new SensorsDaoImp();
-		List<VSensorsId> list = sDao.getSensorsByType2(start, limit,
+		List<VSensorsId> list = sDao.getSensorsByType1(start, limit,
 				(short) 224);
-		Long count = sDao.getSensorsByType2Count((short) 224);
+		Long count = sDao.getSensorsByType1Count((short) 224);
 		System.out.println(System.currentTimeMillis() - time);
 		for (VSensorsId v : list) {
 			if (v.getSensorvalue() > 0) {

@@ -28,7 +28,7 @@ public interface DeviceInfoDao {
 	/**
 	 * 获取当前未处理的门禁事件
 	 */
-	public List<Object[]> getUnReadDCEvents(); 
+	public List<VDcEventsId> getUnReadDCEvents(); 
 	/**
 	 * 获取门禁开关信息总数
 	 */
@@ -50,5 +50,9 @@ public interface DeviceInfoDao {
 	 * 获取海康设备异常设备与机房
 	 */
 	public List<Object[]> getHKAlarmInfo();
+	/**
+	 * 获取设备列表（无缓存）
+	 */
+	List<VItemValueId> getHostList1(String type, Integer start, Integer limit);
 	
 }

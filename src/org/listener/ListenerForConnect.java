@@ -1,5 +1,8 @@
 package org.listener;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -9,6 +12,9 @@ import org.dao.ZMessDao;
 import org.dao.imp.ZConnectCtlDaoImp;
 import org.dao.imp.ZHostConfigDaoImp;
 import org.dao.imp.ZMessDaoImp;
+import org.logicalcobwebs.proxool.ProxoolFacade;
+
+import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 
 import speed.dao.SensorsDao;
 import speed.dao.imp.SensorsDaoImp;
@@ -30,8 +36,23 @@ public class ListenerForConnect implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		// TODO Auto-generated method stub
-
+		// System.out.println("close proxool");
+		// ProxoolFacade.shutdown(0);
+		// try {
+		// System.out.println("close Driver");
+		// while (DriverManager.getDrivers().hasMoreElements()) {
+		// DriverManager.deregisterDriver(DriverManager.getDrivers()
+		// .nextElement());
+		// }
+		// System.out.println("close AbandonedThread");
+		// AbandonedConnectionCleanupThread.shutdown();
+		// } catch (SQLException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 	}
 
 }

@@ -3,7 +3,6 @@ package speed.dao;
 import java.util.List;
 import java.util.Set;
 
-import speed.model.Record;
 import speed.view.VRecordId;
 import speed.view.VSensorsId;
 
@@ -67,5 +66,13 @@ public interface SensorsDao {
 	 * 根据sensorindex返回对应机房和设备类型
 	 */
 	public Object[] getSensorInfoByNo(Integer sensorIndex);
-
+	/**
+	 * 获取传感器列表（无缓存）
+	 */
+	List<VSensorsId> getSensorsByType1(Integer start, Integer limit, Short type);
+	/**
+	 * 获取单个种类的传感器总数（无缓存）
+	 */
+	Long getSensorsByType1Count(Short type);
+	
 }

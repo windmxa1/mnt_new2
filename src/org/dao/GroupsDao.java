@@ -49,4 +49,8 @@ public interface GroupsDao {
 	 * 获取设备间列表
 	 */
 	public List<String> getGroupList();
+	/**
+	 * 获取设备总数（无缓存）
+	 */
+	Long getHostCountByGroupid1(Long groupid);
 }

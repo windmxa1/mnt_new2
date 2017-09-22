@@ -64,7 +64,7 @@ public class DCAction extends ActionSupport { // 门禁
 	public String getDCInfo() throws Exception {
 		// Long time = System.currentTimeMillis();
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
-		List<VItemValueId> list = dInfoDao.getHostList("门禁", start, limit);
+		List<VItemValueId> list = dInfoDao.getHostList1("门禁", start, limit);
 		List<Map<String, String>> li = new ArrayList<>();
 		for (VItemValueId v : list) {
 			Map<String, String> infoMap = new HashMap<String, String>();
@@ -89,55 +89,13 @@ public class DCAction extends ActionSupport { // 门禁
 		}
 		data = new HashMap<>();
 		GroupsDao gDao = new GroupsDaoImp();
-		data.put("total", gDao.getHostCountByGroupid(8L));
+		data.put("total", gDao.getHostCountByGroupid1(8L));
 		data.put("list", li);
 		result = R.getJson(1, "", data);
 		// System.out.println(System.currentTimeMillis() - time);
 		return SUCCESS;
 	}
 
-	// public String getDCInfo() throws Exception { // 待定：是否有null的判断,参照login
-	// GroupsDao gDao = new GroupsDaoImp();
-	// ItemsDao iDao = new ItemsDaoImp();
-	// HistoryTextDao htDao = new HistoryTextDaoImp();
-	// List<VHostGroupId> list = gDao.getLiveHostByGroupid(8L, start, limit);
-	//
-	// List<Map<String, String>> li = new ArrayList<>();
-	// HostDao hDao = new HostDaoImp();
-	// Long time = System.currentTimeMillis();
-	// for (VHostGroupId v : list) { // 遍历每一个主机
-	// Long id = v.getHostid(); // 主机id
-	// String ip = v.getHost(); // 主机ip
-	//
-	// List<Items> iList = iDao.getItemsByHostid(id);
-	//
-	// Map<String, String> infoMap = new HashMap<String, String>();
-	// infoMap.put("hostId", "" + id);
-	// infoMap.put("hostIp", ip);
-	// String location = hDao.getHostGroup(id);
-	// if (location != null) {
-	// infoMap.put("location", location.replace("JF-", ""));
-	// } else {
-	// infoMap.put("location", "");
-	// }
-	// for (Items i : iList) {
-	// HistoryText ht = htDao.getItemsValueByItemId(i.getItemid());
-	// infoMap.put(i.getName(), ht==null?"":ht.getValue());
-	// }
-	// ZHostConfigDao hConfigDao = new ZHostConfigDaoImp();
-	// ZHostConfig hostConfig = hConfigDao.getHostConfig(ip);
-	// infoMap.put("notice", hostConfig.getNotice() + "");
-	//
-	// li.add(infoMap);
-	// }
-	// System.out.println(System.currentTimeMillis()-time+"毫秒");
-	// data = new HashMap<>();
-	// data.put("total", gDao.getHostCountByGroupid(8L));
-	// data.put("list", li);
-	// result = R.getJson(1, "", data);
-	//
-	// return SUCCESS;
-	// }
 
 	/**
 	 * 查看门禁进出信息列表、同时更新门禁的通知状态
@@ -172,27 +130,13 @@ public class DCAction extends ActionSupport { // 门禁
 	// 开门提示
 	public String doorNotice() throws Exception {
 		DeviceInfoDao dDao = new DeviceDaoImp();
-		List<Object[]> list = dDao.getUnReadDCEvents();
-		// Set<String> hostSet = new HashSet<>();
-		// hostSet.addAll(Arrays.asList(list.get(3)));
+		List<VDcEventsId> list = dDao.getUnReadDCEvents();
 		if (list == null || list.size() == 0) {
 			result = R.getJson(0, "", "");
 			return SUCCESS;
 		}
-		String out = "";
-		int i = 0;
-		for (Object[] s : list) {
-			if (i == 0) {
-				out = out + ("" + s[0]).replace("JF-", "") + " " + s[1] + " "
-						+ s[2];
-			} else {
-				out = out + "|" + ("" + s[0]).replace("JF-", "") + " " + s[1]
-						+ " " + s[2];
-			}
-			i = 1;
-		}
 		data = new HashMap<>();
-		data.put("info", out);
+		data.put("list", list);
 		result = R.getJson(1, "", data);
 		return SUCCESS;
 	}

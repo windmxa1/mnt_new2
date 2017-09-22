@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.json.JSONArray;
+
 import org.dao.DeviceInfoDao;
 import org.dao.GroupsDao;
 import org.dao.ServicesDao;
@@ -59,10 +61,46 @@ public class MapAction extends ActionSupport {
 		return SUCCESS;
 	}
 
-	/**
+	
+	 /**
 	 * 获取机房报警(暂时不做门禁和摄像头报警)
 	 */
-	public String getAlarm() {
+	 public String getAlarm() {
+	 Long time = System.currentTimeMillis();
+	 SensorsDao sDao = new SensorsDaoImp();
+	 DeviceInfoDao dInfoDao = new DeviceDaoImp();
+	 ZSwitchDao swDao = new ZSwitchDaoImp();
+	 List<String> list = swDao.getAlarmDevice();
+	
+	 List<Object[]> speedList = sDao.getAlarmInfo();
+	 List<Object[]> hkList = dInfoDao.getHKAlarmInfo();
+	 String s = "";
+	 if (list != null && list.size() > 0) {
+	 for (String sd : list) {
+	 s = s + " " + sd + "告警";
+	 }
+	 }
+	 for (Object[] o : hkList) {
+	 s = s + " " + (o[0].toString().replace("JF-", "")) + o[1] + "异常";
+	 }
+	 for (Object[] o : speedList) {
+	 s = s + " " + o[0] + "-" + o[1] + "异常";
+	 }
+	
+	 if (s.length() == 0) {
+	 result = R.getJson(1, "", "");
+	 } else {
+	 result = R.getJson(0, s, "");
+	 }
+	 System.out.println(System.currentTimeMillis() - time);
+	 return SUCCESS;
+	 }
+
+	/**
+	 * 获取机房报警(没有空调报警)
+	 */
+	public String getAlarm1() {
+		Long time = System.currentTimeMillis();
 		SensorsDao sDao = new SensorsDaoImp();
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
 		ZSwitchDao swDao = new ZSwitchDaoImp();
@@ -70,24 +108,34 @@ public class MapAction extends ActionSupport {
 
 		List<Object[]> speedList = sDao.getAlarmInfo();
 		List<Object[]> hkList = dInfoDao.getHKAlarmInfo();
-		String s = "";
+		List<Map<String, String>> list2 = new ArrayList<>();
+
 		if (list != null && list.size() > 0) {
 			for (String sd : list) {
-				s = s + " " + sd + "告警";
+				Map<String, String> map = new HashMap<>();
+				map.put("jf", "开关量");
+				map.put("desc", sd + "告警");
+				list2.add(map);
 			}
 		}
 		for (Object[] o : hkList) {
-			s = s + " " + (o[0].toString().replace("JF-", "")) + o[1] + "异常";
+			Map<String, String> map = new HashMap<>();
+			map.put("jf", o[0].toString().replace("JF-", ""));
+			map.put("desc", o[0].toString().replace("JF-", "") + o[1] + "异常");
+			list2.add(map);
 		}
 		for (Object[] o : speedList) {
-			s = s + " " + o[0] + o[1] + "异常";
+			Map<String, String> map = new HashMap<>();
+			map.put("jf", "" + o[0]);
+			map.put("desc", o[0] + "" + o[1] + "异常");
+			list2.add(map);
 		}
-
-		if (s.length() == 0) {
-			result = R.getJson(1, "", "");
-		} else {
-			result = R.getJson(0, s, "");
+		if (list2.size() == 0) {
+			result = R.getJson(0, "", list2);
+			return SUCCESS;
 		}
+		result = R.getJson(1, "", list2);
+		System.out.println(System.currentTimeMillis() - time);
 		return SUCCESS;
 	}
 
@@ -105,6 +153,7 @@ public class MapAction extends ActionSupport {
 		}
 		data = new HashMap<>();
 		data.put("list", list2);
+		System.out.println(JSONArray.fromObject(list).toString());
 		result = R.getJson(1, "", data);
 		return SUCCESS;
 	}
@@ -151,96 +200,96 @@ public class MapAction extends ActionSupport {
 		return SUCCESS;
 	}
 
-	public String getTempByGroupName() {
-		data = new HashMap<>();
-		Map<String, Object> session = ActionContext.getContext().getSession();
-		session.put("groupName", groupName.replace("JF-", ""));
-
-		SensorsDao sDao = new SensorsDaoImp();
-		List<VSensorsId> TEMP = sDao.getSensorsByType2(0, -1, (short) 48);
-		data.put("TEMP", TEMP);
-		data.put("total", TEMP.size());
-		result = R.getJson(1, "", data);
-		return SUCCESS;
-	}
-
-	public String getWetByGroupName() {
-		data = new HashMap<>();
-		Map<String, Object> session = ActionContext.getContext().getSession();
-		session.put("groupName", groupName.replace("JF-", ""));
-
-		SensorsDao sDao = new SensorsDaoImp();
-		List<VSensorsId> WET = sDao.getSensorsByType2(0, -1, (short) 49);
-		data.put("WET", WET);
-		data.put("total", WET.size());
-		result = R.getJson(1, "", data);
-		return SUCCESS;
-	}
-
-	public String getWaterLoggingByGroupName() {
-		data = new HashMap<>();
-		Map<String, Object> session = ActionContext.getContext().getSession();
-		session.put("groupName", groupName.replace("JF-", ""));
-
-		SensorsDao sDao = new SensorsDaoImp();
-		List<VSensorsId> WATER = sDao.getSensorsByType2(0, -1, (short) 16);
-		data.put("WATER", WATER);
-		data.put("total", WATER.size());
-		result = R.getJson(1, "", data);
-		return SUCCESS;
-	}
-
-	public String getAirConditionByGroupName() {
-		data = new HashMap<>();
-		Map<String, Object> session = ActionContext.getContext().getSession();
-		session.put("groupName", groupName.replace("JF-", ""));
-
-		SensorsDao sDao = new SensorsDaoImp();
-		List<VSensorsId> AIRCONDITION = sDao.getSensorsByType2(0, -1,
-				(short) 224);
-		for (VSensorsId v : AIRCONDITION) {
-			if (v.getSensorvalue() > 0) {
-				String b = Long.toHexString(v.getSensorvalue().longValue());
-				String c = "00000000".substring(b.length()) + b;
-				Integer num = Integer.parseInt(c.substring(6, 8), 16);
-				Double temp = Double.parseDouble("" + num) / 2;
-				Integer wet = Integer.parseInt(c.substring(4, 6), 16);
-				Integer stateNum = Integer.parseInt(c.substring(2, 4), 16);
-				v.setTemp(temp);
-				v.setWet(wet);
-				v.setState(stateNum > 0 ? 1 : 0);
-				v.setRunModel(SpeedUtils.getState(stateNum));
-			}
-		}
-		data.put("AIRCONDITION", AIRCONDITION);
-		data.put("total", AIRCONDITION.size());
-		result = R.getJson(1, "", data);
-		return SUCCESS;
-	}
-
-	public String getDCByGroupName() {
-		data = new HashMap<>();
-		Map<String, Object> session = ActionContext.getContext().getSession();
-		session.put("groupName", groupName.replace("JF-", ""));
-
-		List<Map<String, String>> DC = getDeviceInfoList("门禁");
-		data.put("DC", DC);
-		data.put("total", DC.size());
-		result = R.getJson(1, "", data);
-		return SUCCESS;
-	}
-
-	public String getIPCByGroupName() {
-		data = new HashMap<>();
-		Map<String, Object> session = ActionContext.getContext().getSession();
-		session.put("groupName", groupName.replace("JF-", ""));
-
-		List<Map<String, String>> IPC = getDeviceInfoList("摄像头");
-		data.put("IPC", IPC);
-		data.put("total", IPC.size());
-		result = R.getJson(1, "", data);
-		return SUCCESS;
-	}
+	// public String getTempByGroupName() {
+	// data = new HashMap<>();
+	// Map<String, Object> session = ActionContext.getContext().getSession();
+	// session.put("groupName", groupName.replace("JF-", ""));
+	//
+	// SensorsDao sDao = new SensorsDaoImp();
+	// List<VSensorsId> TEMP = sDao.getSensorsByType2(0, -1, (short) 48);
+	// data.put("TEMP", TEMP);
+	// data.put("total", TEMP.size());
+	// result = R.getJson(1, "", data);
+	// return SUCCESS;
+	// }
+	//
+	// public String getWetByGroupName() {
+	// data = new HashMap<>();
+	// Map<String, Object> session = ActionContext.getContext().getSession();
+	// session.put("groupName", groupName.replace("JF-", ""));
+	//
+	// SensorsDao sDao = new SensorsDaoImp();
+	// List<VSensorsId> WET = sDao.getSensorsByType2(0, -1, (short) 49);
+	// data.put("WET", WET);
+	// data.put("total", WET.size());
+	// result = R.getJson(1, "", data);
+	// return SUCCESS;
+	// }
+	//
+	// public String getWaterLoggingByGroupName() {
+	// data = new HashMap<>();
+	// Map<String, Object> session = ActionContext.getContext().getSession();
+	// session.put("groupName", groupName.replace("JF-", ""));
+	//
+	// SensorsDao sDao = new SensorsDaoImp();
+	// List<VSensorsId> WATER = sDao.getSensorsByType2(0, -1, (short) 16);
+	// data.put("WATER", WATER);
+	// data.put("total", WATER.size());
+	// result = R.getJson(1, "", data);
+	// return SUCCESS;
+	// }
+	//
+	// public String getAirConditionByGroupName() {
+	// data = new HashMap<>();
+	// Map<String, Object> session = ActionContext.getContext().getSession();
+	// session.put("groupName", groupName.replace("JF-", ""));
+	//
+	// SensorsDao sDao = new SensorsDaoImp();
+	// List<VSensorsId> AIRCONDITION = sDao.getSensorsByType2(0, -1,
+	// (short) 224);
+	// for (VSensorsId v : AIRCONDITION) {
+	// if (v.getSensorvalue() > 0) {
+	// String b = Long.toHexString(v.getSensorvalue().longValue());
+	// String c = "00000000".substring(b.length()) + b;
+	// Integer num = Integer.parseInt(c.substring(6, 8), 16);
+	// Double temp = Double.parseDouble("" + num) / 2;
+	// Integer wet = Integer.parseInt(c.substring(4, 6), 16);
+	// Integer stateNum = Integer.parseInt(c.substring(2, 4), 16);
+	// v.setTemp(temp);
+	// v.setWet(wet);
+	// v.setState(stateNum > 0 ? 1 : 0);
+	// v.setRunModel(SpeedUtils.getState(stateNum));
+	// }
+	// }
+	// data.put("AIRCONDITION", AIRCONDITION);
+	// data.put("total", AIRCONDITION.size());
+	// result = R.getJson(1, "", data);
+	// return SUCCESS;
+	// }
+	//
+	// public String getDCByGroupName() {
+	// data = new HashMap<>();
+	// Map<String, Object> session = ActionContext.getContext().getSession();
+	// session.put("groupName", groupName.replace("JF-", ""));
+	//
+	// List<Map<String, String>> DC = getDeviceInfoList("门禁");
+	// data.put("DC", DC);
+	// data.put("total", DC.size());
+	// result = R.getJson(1, "", data);
+	// return SUCCESS;
+	// }
+	//
+	// public String getIPCByGroupName() {
+	// data = new HashMap<>();
+	// Map<String, Object> session = ActionContext.getContext().getSession();
+	// session.put("groupName", groupName.replace("JF-", ""));
+	//
+	// List<Map<String, String>> IPC = getDeviceInfoList("摄像头");
+	// data.put("IPC", IPC);
+	// data.put("total", IPC.size());
+	// result = R.getJson(1, "", data);
+	// return SUCCESS;
+	// }
 
 	/**
 	 * 获取设备列表
@@ -257,6 +306,7 @@ public class MapAction extends ActionSupport {
 			switch (type) {
 			case "门禁":
 				infoMap.put("notice", "" + v.getNotice());
+				infoMap.put("deviceName", "" + v.getDeviceName());
 				String s1[] = v.getName().split(",");
 				String s2[] = v.getValue().split(",");
 				infoMap.put(s1[0], s2[0]);
@@ -273,6 +323,7 @@ public class MapAction extends ActionSupport {
 				break;
 			case "摄像头":
 				infoMap.put(v.getName(), v.getValue());
+				infoMap.put("deviceName", v.getDeviceName());
 				infoMap.put("nvrIp", v.getNvrIp());
 				li.add(infoMap);
 			}

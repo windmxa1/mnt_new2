@@ -28,7 +28,7 @@ public class GroupsDaoImp implements GroupsDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -42,12 +42,11 @@ public class GroupsDaoImp implements GroupsDao {
 
 			List<Long> list = query.list();
 
-
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -71,7 +70,7 @@ public class GroupsDaoImp implements GroupsDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -196,6 +195,26 @@ public class GroupsDaoImp implements GroupsDao {
 				query = session.createQuery(sql);
 				query.setParameter(0, groupid);
 			}
+			query.setMaxResults(1);
+			Long count = (Long) query.uniqueResult();
+			return count;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0L;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public Long getHostCountByGroupid1(Long groupid) {
+		try {
+			String sql = "";
+			Session session = HibernateSessionFactory.getSession();
+			Query query = null;
+			sql = "select count(v.id.groupid) from VHostGroup v where v.id.groupid=?";
+			query = session.createQuery(sql);
+			query.setParameter(0, groupid);
 			query.setMaxResults(1);
 			Long count = (Long) query.uniqueResult();
 			return count;
