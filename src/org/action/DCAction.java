@@ -62,7 +62,6 @@ public class DCAction extends ActionSupport { // 门禁
 	}
 
 	public String getDCInfo() throws Exception {
-		// Long time = System.currentTimeMillis();
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
 		List<VItemValueId> list = dInfoDao.getHostList1("门禁", start, limit);
 		List<Map<String, String>> li = new ArrayList<>();
@@ -76,15 +75,7 @@ public class DCAction extends ActionSupport { // 门禁
 			String s1[] = v.getName().split(",");
 			String s2[] = v.getValue().split(",");
 			infoMap.put(s1[0], s2[0]);
-			try {
-				infoMap.put(s1[1], s2[1]);
-				infoMap.put(s1[2], s2[2]);
-				infoMap.put(s1[3], s2[3]);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				infoMap.put(s1[1], "");
-				infoMap.put(s1[2], "");
-				infoMap.put(s1[3], "");
-			}
+			infoMap.put(s1[1], s2[1]);
 			li.add(infoMap);
 		}
 		data = new HashMap<>();
@@ -92,10 +83,8 @@ public class DCAction extends ActionSupport { // 门禁
 		data.put("total", gDao.getHostCountByGroupid1(8L));
 		data.put("list", li);
 		result = R.getJson(1, "", data);
-		// System.out.println(System.currentTimeMillis() - time);
 		return SUCCESS;
 	}
-
 
 	/**
 	 * 查看门禁进出信息列表、同时更新门禁的通知状态

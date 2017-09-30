@@ -61,40 +61,39 @@ public class MapAction extends ActionSupport {
 		return SUCCESS;
 	}
 
-	
-	 /**
+	/**
 	 * 获取机房报警(暂时不做门禁和摄像头报警)
 	 */
-	 public String getAlarm() {
-	 Long time = System.currentTimeMillis();
-	 SensorsDao sDao = new SensorsDaoImp();
-	 DeviceInfoDao dInfoDao = new DeviceDaoImp();
-	 ZSwitchDao swDao = new ZSwitchDaoImp();
-	 List<String> list = swDao.getAlarmDevice();
-	
-	 List<Object[]> speedList = sDao.getAlarmInfo();
-	 List<Object[]> hkList = dInfoDao.getHKAlarmInfo();
-	 String s = "";
-	 if (list != null && list.size() > 0) {
-	 for (String sd : list) {
-	 s = s + " " + sd + "告警";
-	 }
-	 }
-	 for (Object[] o : hkList) {
-	 s = s + " " + (o[0].toString().replace("JF-", "")) + o[1] + "异常";
-	 }
-	 for (Object[] o : speedList) {
-	 s = s + " " + o[0] + "-" + o[1] + "异常";
-	 }
-	
-	 if (s.length() == 0) {
-	 result = R.getJson(1, "", "");
-	 } else {
-	 result = R.getJson(0, s, "");
-	 }
-	 System.out.println(System.currentTimeMillis() - time);
-	 return SUCCESS;
-	 }
+	public String getAlarm() {
+		Long time = System.currentTimeMillis();
+		SensorsDao sDao = new SensorsDaoImp();
+		DeviceInfoDao dInfoDao = new DeviceDaoImp();
+		ZSwitchDao swDao = new ZSwitchDaoImp();
+		List<String> list = swDao.getAlarmDevice();
+
+		List<Object[]> speedList = sDao.getAlarmInfo();
+		List<Object[]> hkList = dInfoDao.getHKAlarmInfo();
+		String s = "";
+		if (list != null && list.size() > 0) {
+			for (String sd : list) {
+				s = s + " " + sd + "告警";
+			}
+		}
+		for (Object[] o : hkList) {
+			s = s + " " + (o[0].toString().replace("JF-", "")) + o[1] + "异常";
+		}
+		for (Object[] o : speedList) {
+			s = s + " " + o[0] + "-" + o[1] + "异常";
+		}
+
+		if (s.length() == 0) {
+			result = R.getJson(1, "", "");
+		} else {
+			result = R.getJson(0, s, "");
+		}
+		System.out.println(System.currentTimeMillis() - time);
+		return SUCCESS;
+	}
 
 	/**
 	 * 获取机房报警(没有空调报警)
@@ -310,15 +309,7 @@ public class MapAction extends ActionSupport {
 				String s1[] = v.getName().split(",");
 				String s2[] = v.getValue().split(",");
 				infoMap.put(s1[0], s2[0]);
-				try {
-					infoMap.put(s1[1], s2[1]);
-					infoMap.put(s1[2], s2[2]);
-					infoMap.put(s1[3], s2[3]);
-				} catch (ArrayIndexOutOfBoundsException e) {
-					infoMap.put(s1[1], "");
-					infoMap.put(s1[2], "");
-					infoMap.put(s1[3], "");
-				}
+				infoMap.put(s1[1], s2[1]);
 				li.add(infoMap);
 				break;
 			case "摄像头":
