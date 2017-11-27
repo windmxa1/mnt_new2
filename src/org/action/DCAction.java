@@ -76,6 +76,9 @@ public class DCAction extends ActionSupport { // 门禁
 			String s2[] = v.getValue().split(",");
 			infoMap.put(s1[0], s2[0]);
 			infoMap.put(s1[1], s2[1]);
+			if(v.getHost().equals("192.168.117.121")){
+				infoMap.put(s1[2], s2[2]);
+			}
 			li.add(infoMap);
 		}
 		data = new HashMap<>();
