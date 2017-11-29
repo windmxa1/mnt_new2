@@ -44,13 +44,18 @@ public class ZHostConfigDaoImp implements ZHostConfigDao {
 		try {
 			Session session = HibernateSessionFactory.getSession();
 			Transaction ts = session.beginTransaction();
-			String sql1 = "truncate table z_host_config";
-			SQLQuery sqlQuery = session.createSQLQuery(sql1);
-			sqlQuery.executeUpdate();
+//			String sql1 = "truncate table z_host_config";
+//			SQLQuery sqlQuery = session.createSQLQuery(sql1);
+//			sqlQuery.executeUpdate();
 
 			String sql2 = "select h.host from Hosts h,HostsGroups hg,Groups g where h.hostid=hg.hostid and hg.groupid= g.groupid and g.name like '%海康%' ";
 			Query query = session.createQuery(sql2);
 			List<String> list = query.list();
+			String sql3 = "select host from z_host_config";
+			SQLQuery query3 = session.createSQLQuery(sql3);
+			List<String> list2 = query3.list();
+			list.removeAll(list2);
+
 			for (String host : list) {
 				session.save(new ZHostConfig(host));
 			}

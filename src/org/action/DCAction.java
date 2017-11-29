@@ -11,6 +11,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONArray;
+
 import org.apache.struts2.ServletActionContext;
 import org.apache.taglibs.standard.tag.rt.core.OutTag;
 import org.dao.DeviceInfoDao;
