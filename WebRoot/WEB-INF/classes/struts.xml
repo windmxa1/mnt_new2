@@ -330,6 +330,12 @@
 	</package>
 
 	<package name="nolog" extends="json-default,myFilter" namespace="/">
+		<action name="updateRecordStatus" class="org.action.IPCAction"
+			method="updateRecordStatus">	<!-- 修改录像状态 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
 		<action name="getIPCIpByName" class="org.action.IPCAction"
 			method="getIPCIpByName">	<!-- 获取角色名称列表 -->
 			<result type="json" name="success">

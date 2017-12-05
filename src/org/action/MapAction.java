@@ -11,10 +11,12 @@ import net.sf.json.JSONArray;
 import org.dao.DeviceInfoDao;
 import org.dao.GroupsDao;
 import org.dao.ServicesDao;
+import org.dao.ZIPCRecordingDao;
 import org.dao.ZSwitchDao;
 import org.dao.imp.DeviceDaoImp;
 import org.dao.imp.GroupsDaoImp;
 import org.dao.imp.ServicesDaoImp;
+import org.dao.imp.ZIPCRecordingDaoImp;
 import org.dao.imp.ZSwitchDaoImp;
 import org.tool.R;
 import org.util.SpeedUtils;
@@ -84,6 +86,11 @@ public class MapAction extends ActionSupport {
 		}
 		for (Object[] o : speedList) {
 			s = s + " " + o[0] + "-" + o[1] + "异常";
+		}
+		ZIPCRecordingDao ipcDao = new ZIPCRecordingDaoImp();
+		List<String> recordingList = ipcDao.getRecordingList();
+		for (String o : recordingList) {
+			s = s + " 摄像头-" + o + "正在录像";
 		}
 
 		if (s.length() == 0) {
@@ -301,24 +308,24 @@ public class MapAction extends ActionSupport {
 			Map<String, String> infoMap = new HashMap<String, String>();
 			infoMap.put("hostIp", v.getHost());
 			infoMap.put("hostId", "" + v.getHostid());
-			infoMap.put("location", v.getGroupname());
+			infoMap.put("location", v.getGroupname()); 
+			infoMap.put("deviceName", v.getDeviceName());
 			switch (type) {
 			case "门禁":
 				infoMap.put("notice", "" + v.getNotice());
-				infoMap.put("deviceName", "" + v.getDeviceName());
 				String s1[] = v.getName().split(",");
 				String s2[] = v.getValue().split(",");
 				infoMap.put(s1[0], s2[0]);
 				infoMap.put(s1[1], s2[1]);
-				if(v.getHost().equals("192.168.117.121")){
+				if (v.getHost().equals("192.168.117.121")) {
 					infoMap.put(s1[2], s2[2]);
 				}
 				li.add(infoMap);
 				break;
 			case "摄像头":
 				infoMap.put(v.getName(), v.getValue());
-				infoMap.put("deviceName", v.getDeviceName());
 				infoMap.put("nvrIp", v.getNvrIp());
+				infoMap.put("recordStatus", "" + v.getIsRecording());
 				li.add(infoMap);
 			}
 		}

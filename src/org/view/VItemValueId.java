@@ -11,6 +11,7 @@ public class VItemValueId implements java.io.Serializable {
 	private Long hostid;
 	private String groupname;
 	private String host;
+	private Integer isRecording;
 	private String name;
 	private String value;
 	private String clock;
@@ -35,11 +36,12 @@ public class VItemValueId implements java.io.Serializable {
 
 	/** full constructor */
 	public VItemValueId(Long hostid, String groupname, String host,
-			String name, String value, String clock, String type,
-			Integer notice, String nvrIp, String deviceName) {
+			Integer isRecording, String name, String value, String clock,
+			String type, Integer notice, String nvrIp, String deviceName) {
 		this.hostid = hostid;
 		this.groupname = groupname;
 		this.host = host;
+		this.isRecording = isRecording;
 		this.name = name;
 		this.value = value;
 		this.clock = clock;
@@ -73,6 +75,14 @@ public class VItemValueId implements java.io.Serializable {
 
 	public void setHost(String host) {
 		this.host = host;
+	}
+
+	public Integer getIsRecording() {
+		return this.isRecording;
+	}
+
+	public void setIsRecording(Integer isRecording) {
+		this.isRecording = isRecording;
 	}
 
 	public String getName() {
@@ -150,6 +160,10 @@ public class VItemValueId implements java.io.Serializable {
 				&& ((this.getHost() == castOther.getHost()) || (this.getHost() != null
 						&& castOther.getHost() != null && this.getHost()
 						.equals(castOther.getHost())))
+				&& ((this.getIsRecording() == castOther.getIsRecording()) || (this
+						.getIsRecording() != null
+						&& castOther.getIsRecording() != null && this
+						.getIsRecording().equals(castOther.getIsRecording())))
 				&& ((this.getName() == castOther.getName()) || (this.getName() != null
 						&& castOther.getName() != null && this.getName()
 						.equals(castOther.getName())))
@@ -183,6 +197,10 @@ public class VItemValueId implements java.io.Serializable {
 				+ (getGroupname() == null ? 0 : this.getGroupname().hashCode());
 		result = 37 * result
 				+ (getHost() == null ? 0 : this.getHost().hashCode());
+		result = 37
+				* result
+				+ (getIsRecording() == null ? 0 : this.getIsRecording()
+						.hashCode());
 		result = 37 * result
 				+ (getName() == null ? 0 : this.getName().hashCode());
 		result = 37 * result

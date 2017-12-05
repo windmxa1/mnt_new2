@@ -8,9 +8,11 @@ import java.util.Map;
 import org.dao.DeviceInfoDao;
 import org.dao.GroupsDao;
 import org.dao.ZIPCRecordDao;
+import org.dao.ZIPCRecordingDao;
 import org.dao.imp.DeviceDaoImp;
 import org.dao.imp.GroupsDaoImp;
 import org.dao.imp.ZIPCRecordDaoImp;
+import org.dao.imp.ZIPCRecordingDaoImp;
 import org.model.ZIpcRecord;
 import org.tool.R;
 import org.view.VItemValueId;
@@ -23,6 +25,8 @@ public class IPCAction extends ActionSupport {
 	private Integer start;
 	private Integer limit;
 	private String name;
+	private String host;
+	private Integer isRecording;
 	private ZIpcRecord record;
 
 	public String getIPCInfo() throws Exception { // 待定：是否有null的判断,参照login
@@ -37,6 +41,7 @@ public class IPCAction extends ActionSupport {
 			infoMap.put(v.getName(), v.getValue());
 			infoMap.put("deviceName", v.getDeviceName());
 			infoMap.put("nvrIp", v.getNvrIp());
+			infoMap.put("recordStatus", "" + v.getIsRecording());
 			li.add(infoMap);
 		}
 		data = new HashMap<>();
@@ -52,7 +57,7 @@ public class IPCAction extends ActionSupport {
 	 */
 	public String getIPCRecordList() throws Exception { // 待定：是否有null的判断,参照login
 		ZIPCRecordDao zDao = new ZIPCRecordDaoImp();
-		List<ZIpcRecord> li = zDao.getList(start,limit);
+		List<ZIpcRecord> li = zDao.getList(start, limit);
 		if (li == null) {
 			result = R.getJson(0, "加载失败，请重试", "");
 			return SUCCESS;
@@ -69,7 +74,7 @@ public class IPCAction extends ActionSupport {
 	 */
 	public String addIPCLocalRecord() throws Exception {
 		ZIPCRecordDao zDao = new ZIPCRecordDaoImp();
-		if (zDao.saveOrUpdate(record)>0) {
+		if (zDao.saveOrUpdate(record) > 0) {
 			result = R.getJson(1, "", "");
 			return SUCCESS;
 		}
@@ -85,6 +90,19 @@ public class IPCAction extends ActionSupport {
 		data = new HashMap<>();
 		data.put("ipcIP", dInfoDao.getIPCIpByName(name));
 		result = R.getJson(1, "", data);
+		return SUCCESS;
+	}
+
+	/**
+	 * 修改录像状态
+	 */
+	public String updateRecordStatus() throws Exception {
+		ZIPCRecordingDao ipcDao = new ZIPCRecordingDaoImp();
+		if (ipcDao.updateRecordStatus(host, isRecording)) {
+			result = R.getJson(1, "", "");
+			return SUCCESS;
+		}
+		result = R.getJson(0, "", "");
 		return SUCCESS;
 	}
 
@@ -126,5 +144,21 @@ public class IPCAction extends ActionSupport {
 
 	public void setRecord(ZIpcRecord record) {
 		this.record = record;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public Integer getIsRecording() {
+		return isRecording;
+	}
+
+	public void setIsRecording(Integer isRecording) {
+		this.isRecording = isRecording;
 	}
 }

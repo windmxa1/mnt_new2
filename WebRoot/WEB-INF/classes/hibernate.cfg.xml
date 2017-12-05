@@ -62,6 +62,7 @@
 	<mapping resource="org/view/VServices.hbm.xml" />
 	<mapping resource="org/view/VItemValue.hbm.xml" />
 	<mapping resource="org/model/ZIpcRecord.hbm.xml" />
+	<mapping resource="org/model/ZIpcRecording.hbm.xml" />
 </session-factory>
 
 </hibernate-configuration>

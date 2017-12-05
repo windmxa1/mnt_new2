@@ -1,20 +1,14 @@
 package org.listener;
 
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.dao.ZConnectCtlDao;
 import org.dao.ZHostConfigDao;
-import org.dao.ZMessDao;
+import org.dao.ZIPCRecordingDao;
 import org.dao.imp.ZConnectCtlDaoImp;
 import org.dao.imp.ZHostConfigDaoImp;
-import org.dao.imp.ZMessDaoImp;
-import org.logicalcobwebs.proxool.ProxoolFacade;
-
-import com.mysql.jdbc.AbandonedConnectionCleanupThread;
+import org.dao.imp.ZIPCRecordingDaoImp;
 
 import speed.dao.SensorsDao;
 import speed.dao.imp.SensorsDaoImp;
@@ -30,6 +24,8 @@ public class ListenerForConnect implements ServletContextListener {
 		ctlDao.deleteAll();
 		ZHostConfigDao hConfigDao = new ZHostConfigDaoImp();
 		hConfigDao.init();
+		ZIPCRecordingDao ipcDao = new ZIPCRecordingDaoImp();
+		ipcDao.init();
 		SensorsDao sDao = new SensorsDaoImp();
 		sDao.init();
 	}

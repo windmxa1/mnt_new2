@@ -16,6 +16,9 @@
             <key-property name="host" type="java.lang.String">
                 <column name="host" length="128" />
             </key-property>
+            <key-property name="isRecording" type="java.lang.Integer">
+                <column name="is_recording" />
+            </key-property>
             <key-property name="name" type="java.lang.String">
                 <column name="name" length="65535" />
             </key-property>
