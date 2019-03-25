@@ -16,4 +16,8 @@ public interface ZIPCRecordingDao {
 	 * 列出正在录像的摄像头名称
 	 */
 	public List<String> getRecordingList();
+	/**
+	 * 重启客户端时调用
+	 */
+	public Boolean init1 ();
 }

@@ -53,7 +53,17 @@ public class ZUserAction extends ActionSupport {
 	private String role;
 	private Boolean isAutoLogout;// 自动注销是否启动
 	private Long interval = 5 * 60L;// 自动注销时间间隔
-
+	
+	public String timeCountDown(){
+		uDao = new ZUserDaoImp();
+		if(uDao.outOfTime(System.currentTimeMillis()/1000)){
+			result = R.getJson(1, "", true);
+		}else{
+			result = R.getJson(0, "", false);
+		}
+		return SUCCESS;
+	}
+	
 	/**
 	 * 自动注销
 	 */

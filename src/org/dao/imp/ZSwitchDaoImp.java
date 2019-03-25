@@ -8,6 +8,8 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.model.ZSwitch;
+import org.model.ZSwitchAlarm;
 import org.util.HibernateSessionFactory;
 import org.view.VSwitch;
 import org.view.VSwitchAlarm;
@@ -107,7 +109,7 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 			Integer limit, Integer id) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			String sql = "select s.* from v_switch_alarm s where switch_id=? order by id desc";
+			String sql = "select s.* from v_switch_alarm s where switch_id=? and id>5 order by id desc";
 			SQLQuery query = session.createSQLQuery(sql);
 			if (start == null)
 				start = 0;
@@ -155,11 +157,20 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 
 	@Override
 	public List<VSwitchAlarmId> getSwitchAlarmHistory(Integer start,
-			Integer limit) {
+			Integer limit, String name) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			String sql = "from VSwitchAlarm v order by v.id.id desc";
-			Query query = session.createQuery(sql);
+			String sql;
+			Query query;
+			if (name == null) {
+				sql = "from VSwitchAlarm v where v.id.id>5 order by v.id.id desc";
+				query = session.createQuery(sql);
+			} else {
+				sql = "from VSwitchAlarm v where v.id.name=? and v.id.id>5 order by v.id.id desc";
+				query = session.createQuery(sql);
+				query.setParameter(0, name);
+			}
+
 			if (start == null)
 				start = 0;
 			if (limit == null) {
@@ -169,6 +180,7 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 			} else {
 				query.setMaxResults(limit);
 			}
+			query.setFirstResult(start);
 			List<VSwitchAlarm> list = query.list();
 			List<VSwitchAlarmId> list2 = new ArrayList<>();
 			for (VSwitchAlarm v : list) {
@@ -184,11 +196,19 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 	}
 
 	@Override
-	public Long getSwitchAlarmCount() {
+	public Long getSwitchAlarmCount(String name) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			String sql = "select count (v.id.id) from VSwitchAlarm v ";
-			Query query = session.createQuery(sql);
+			Query query;
+			String sql;
+			if (name == null) {
+				sql = "select count (v.id.id) from VSwitchAlarm v where v.id.id>5";
+				query = session.createQuery(sql);
+			} else {
+				sql = "select count (v.id.id) from VSwitchAlarm v where v.id.name=? and v.id.id>5";
+				query = session.createQuery(sql);
+				query.setParameter(0, name);
+			}
 			query.setMaxResults(1);
 			Long count = (Long) query.uniqueResult();
 			return count;
@@ -202,11 +222,19 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 
 	@Override
 	public List<VSwitchAlarmId> getSwitchAlarmHistory(Integer start,
-			Integer limit, String start_time, String end_time) {
+			Integer limit, String start_time, String end_time, String name) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			String sql = "from VSwitchAlarm v where v.id.time between ? and ? order by v.id.id desc";
-			Query query = session.createQuery(sql);
+			Query query;
+			String sql;
+			if (name == null) {
+				sql = "from VSwitchAlarm v where v.id.time between ? and ? and v.id.id>5 order by v.id.id desc";
+				query = session.createQuery(sql);
+			} else {
+				sql = "from VSwitchAlarm v where ( v.id.time between ? and ?) and v.id.name=? and v.id.id>5 order by v.id.id desc";
+				query = session.createQuery(sql);
+				query.setParameter(2, name);
+			}
 			if (start == null)
 				start = 0;
 			if (limit == null) {
@@ -216,9 +244,9 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 			} else {
 				query.setMaxResults(limit);
 			}
+			query.setFirstResult(start);
 			query.setParameter(0, start_time);
 			query.setParameter(1, end_time);
-
 			List<VSwitchAlarm> list = query.list();
 			List<VSwitchAlarmId> list2 = new ArrayList<>();
 			for (VSwitchAlarm v : list) {
@@ -234,11 +262,20 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 	}
 
 	@Override
-	public Long getSwitchAlarmCount(String start_time, String end_time) {
+	public Long getSwitchAlarmCount(String start_time, String end_time,
+			String name) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
-			String sql = "select count (v.id.id) from VSwitchAlarm v where v.id.time between ? and ?";
-			Query query = session.createQuery(sql);
+			String sql;
+			Query query;
+			if (name == null) {
+				sql = "select count (v.id.id) from VSwitchAlarm v where v.id.time between ? and ? and v.id.id>5";
+				query = session.createQuery(sql);
+			} else {
+				sql = "select count (v.id.id) from VSwitchAlarm v where (v.id.time between ? and ? ) and v.id.name=? and v.id.id>5";
+				query = session.createQuery(sql);
+				query.setParameter(2, name);
+			}
 			query.setParameter(0, start_time);
 			query.setParameter(1, end_time);
 			query.setMaxResults(1);
@@ -253,16 +290,54 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 	}
 
 	@Override
-	public boolean deleteSwitchAlarm(Long start_clock, Long end_clock) {
+	public boolean deleteSwitchAlarm(Long start_clock, Long end_clock,
+			String name) {
 		try {
 			Session session = HibernateSessionFactory.getSession();
 			Transaction ts = session.beginTransaction();
-			String sql = "delete from ZSwitchAlarm where (clock between ? and ?) and clock!=? and id>6";
-			Query query = session.createQuery(sql);
+			String sql = "select max(id),min(id) from v_switch_alarm where (clock between ? and ?) and clock!=? and id>6 ";
+			if (name != null) {
+				sql += " and name = :name";
+			}
+			SQLQuery query = session.createSQLQuery(sql);
+			if (name != null) {
+				query.setString("name", name);
+			}
 			query.setParameter(0, Integer.parseInt("" + start_clock));
 			query.setParameter(1, Integer.parseInt("" + end_clock));
 			query.setParameter(2, Integer.parseInt("" + end_clock));
+			query.setMaxResults(1);
+			Object[] num = (Object[]) query.uniqueResult();
+			Query query2 = session
+					.createQuery("delete from ZSwitchAlarm where id>5 and id between ? and ?");
+			query2.setParameter(0, num[0]);
+			query2.setParameter(1, num[1]);
+			query2.executeUpdate();
+			ts.commit();
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public boolean deleteAll() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Transaction ts = session.beginTransaction();
+			String sql = "truncate table z_switch_alarm";
+			SQLQuery query = session.createSQLQuery(sql);
 			query.executeUpdate();
+			session.save(new ZSwitchAlarm(1, "ERROR", 1511486058, 1));
+			session.save(new ZSwitchAlarm(2, "ERROR", 1511486058, 1));
+			session.save(new ZSwitchAlarm(3, "ERROR", 1511486058, 1));
+			session.save(new ZSwitchAlarm(4, "ERROR", 1511486058, 1));
+			session.save(new ZSwitchAlarm(5, "ERROR", 1511486058, 1));
+			session.save(new ZSwitchAlarm(6, "ERROR", 1511486058, 1));
 			ts.commit();
 			return true;
 		} catch (Exception e) {
@@ -282,6 +357,22 @@ public class ZSwitchDaoImp implements ZSwitchDao {
 			Query query = session.createQuery(sql);
 			query.setParameter(0, id);
 			String name = (String) query.uniqueResult();
+			return name;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List getSwitchNameList() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select name from ZSwitch";
+			Query query = session.createQuery(sql);
+			List<String> name = query.list();
 			return name;
 		} catch (Exception e) {
 			e.printStackTrace();

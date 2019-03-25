@@ -8,6 +8,10 @@ import org.view.VUserId;
 
 public interface ZUserDao {
 	/**
+	 * 比较当前时间与目标时间
+	 */
+	public boolean outOfTime(Long time);
+	/**
 	 * 获取用户
 	 */
 	public ZUser getUser(String username);

@@ -1,12 +1,14 @@
 package org.dao.imp;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.xml.registry.infomodel.User;
 
 import org.dao.ZUserDao;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.model.ZUser;
@@ -16,6 +18,38 @@ import org.view.VUser;
 import org.view.VUserId;
 
 public class ZUserDaoImp implements ZUserDao {
+	public boolean outOfTime(Long time) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Transaction ts = session.beginTransaction();
+			SQLQuery query = session
+					.createSQLQuery("select * from z_constants where c_long_value > ? and c_name = 'transferredLogTime' ");
+			query.setParameter(0, time);
+			query.setMaxResults(1);
+			boolean outoftime = query.uniqueResult() == null;
+			if (outoftime) {
+				SQLQuery query2 = session
+						.createSQLQuery("update z_constants set c_long_value = ? where c_name = 'transferredLogTime' ");
+				Calendar c = Calendar.getInstance();
+				c.setTimeInMillis(time*1000);
+				if(c.get(Calendar.MONTH)+1==12){
+					c.set(Calendar.MONTH, 0);
+					c.set(Calendar.YEAR, c.get(Calendar.YEAR)+1);
+				}else{
+					c.set(Calendar.MONTH, c.get(Calendar.MONTH)+1);
+				}
+				query2.setParameter(0, c.getTimeInMillis()/1000);
+				query2.executeUpdate();
+			}
+			ts.commit();
+			return outoftime;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
 
 	public ZUser getUser(String username) {
 		try {
@@ -47,7 +81,7 @@ public class ZUserDaoImp implements ZUserDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -61,11 +95,11 @@ public class ZUserDaoImp implements ZUserDao {
 			query.setParameter(1, password);
 			query.setMaxResults(1);
 			ZUser usr = (ZUser) query.uniqueResult();
-				return usr;
+			return usr;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -151,7 +185,7 @@ public class ZUserDaoImp implements ZUserDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -168,7 +202,7 @@ public class ZUserDaoImp implements ZUserDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -190,7 +224,7 @@ public class ZUserDaoImp implements ZUserDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -210,7 +244,7 @@ public class ZUserDaoImp implements ZUserDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}
@@ -233,7 +267,7 @@ public class ZUserDaoImp implements ZUserDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}finally{
+		} finally {
 			HibernateSessionFactory.closeSession();
 		}
 	}

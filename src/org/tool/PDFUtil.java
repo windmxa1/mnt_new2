@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.view.VEventsId;
 import org.view.VLogId;
 import org.view.VSwitchAlarmId;
+
+import speed.view.VRecordId;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;
@@ -41,13 +44,27 @@ public class PDFUtil {
 	 * @param data
 	 *            数据数组
 	 * @param type
-	 *            0开关量报警记录，1暂无，2操作记录
+	 *            0开关量报警记录，1传感器告警记录，2操作记录,3海康设备事件记录
 	 */
 	public static String buidPDF(String imageFile, List data, Integer type) {
 		// File file = File.createTempFile("tempFile", ".pdf"); // 创建临时文件
 		File file = new File(Constans.pdfDir + "test.pdf");// 模板文件
 		Double a = 100000 + Math.random() * 899999;// 6位随机数
-		String filename = ChangeTime.timeStamp() + a.intValue();
+		String filename = ChangeTime.currentDate() + "_";
+		switch (type) {
+		case 0:
+			filename +="开关量报警记录_"+a;
+			break;
+		case 1:
+			filename +="传感器告警记录_"+a;
+			break;
+		case 2:
+			filename +="操作记录_"+a;
+			break;
+		case 3:
+			filename +="海康设备事件记录_"+a;
+			break;
+		}
 		Integer currentDate = ChangeTime.currentDate();
 		String pdfFile = Constans.pdfDir + currentDate + Constans.dot
 				+ filename + ".pdf"; // 输出文件
@@ -72,8 +89,20 @@ public class PDFUtil {
 				waterMark(file.getPath(), imageFile, pdfFile); // 添加水印
 			}
 			break;
+		case 1:
+			if (createSensorAlarmPDF(file, data)) {
+				System.out.println("添加水印");
+				waterMark(file.getPath(), imageFile, pdfFile); // 添加水印
+			}
+			break;
 		case 2:
 			if (createLogPDF(file, data)) {
+				System.out.println("添加水印");
+				waterMark(file.getPath(), imageFile, pdfFile); // 添加水印
+			}
+			break;
+		case 3:
+			if (createEventsPDF(file, data)) {
 				System.out.println("添加水印");
 				waterMark(file.getPath(), imageFile, pdfFile); // 添加水印
 			}
@@ -195,6 +224,101 @@ public class PDFUtil {
 				table.addCell(selector.process("" + sa.getName()));
 				table.addCell(selector.process("" + sa.getTime()));
 				table.addCell(selector.process("" + sa.getAck()));
+			}
+			doc.add(table);
+			doc.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * 创建PDF文件
+	 */
+	private static boolean createSensorAlarmPDF(File file, List<VRecordId> list) {
+		System.out.println("生成pdf");
+		Rectangle rect = new Rectangle(PageSize.A4);
+		Document doc = new Document(rect, 50.0F, 50.0F, 50.0F, 50.0F);
+		try {
+			PdfWriter.getInstance(doc, new FileOutputStream(file));
+			doc.open();
+
+			// 字体处理，中文需要用到
+			FontSelector selector = new FontSelector();
+			// 设置英文显示字体TIMES_ROMAN及大小
+			selector.addFont(FontFactory.getFont(FontFactory.TIMES_ROMAN, 10));
+			// 设置中文显示字体STSong-Light
+			Font cf1 = FontFactory.getFont("STSong-Light", "UniGB-UCS2-H",
+					BaseFont.NOT_EMBEDDED, 10);
+			selector.addFont(cf1);
+			// 设置标题显示字体STSong-Light及大小
+			Font headerFont = FontFactory.getFont("STSong-Light",
+					"UniGB-UCS2-H", BaseFont.NOT_EMBEDDED, 18);
+			PdfPTable table = new PdfPTable(4);
+			PdfPCell cell = new PdfPCell(new Paragraph("告警信息记录", headerFont));
+			cell.setHorizontalAlignment(1);
+			cell.setColspan(4);
+			table.addCell(cell);
+			table.addCell(selector.process("设备名称"));
+			table.addCell(selector.process("所属机房"));
+			table.addCell(selector.process("告警消息"));
+			table.addCell(selector.process("告警时间"));
+			Long time = System.currentTimeMillis();
+			for (VRecordId r : list) {
+				table.addCell(selector.process("" + r.getName()));
+				table.addCell(selector.process("" + r.getLocation()));
+				table.addCell(selector.process("" + r.getMessage()));
+				table.addCell(selector.process("" + r.getTime()));
+			}
+			System.out.println(System.currentTimeMillis() - time);
+			doc.add(table);
+			doc.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * 创建PDF文件
+	 */
+	private static boolean createEventsPDF(File file, List<VEventsId> list) {
+		System.out.println("生成pdf");
+		Rectangle rect = new Rectangle(PageSize.A4);
+		Document doc = new Document(rect, 50.0F, 50.0F, 50.0F, 50.0F);
+		try {
+			PdfWriter.getInstance(doc, new FileOutputStream(file));
+			doc.open();
+
+			// 字体处理，中文需要用到
+			FontSelector selector = new FontSelector();
+			// 设置英文显示字体TIMES_ROMAN及大小
+			selector.addFont(FontFactory.getFont(FontFactory.TIMES_ROMAN, 10));
+			// 设置中文显示字体STSong-Light
+			Font cf1 = FontFactory.getFont("STSong-Light", "UniGB-UCS2-H",
+					BaseFont.NOT_EMBEDDED, 10);
+			selector.addFont(cf1);
+			// 设置标题显示字体STSong-Light及大小
+			Font headerFont = FontFactory.getFont("STSong-Light",
+					"UniGB-UCS2-H", BaseFont.NOT_EMBEDDED, 18);
+			PdfPTable table = new PdfPTable(4);
+			PdfPCell cell = new PdfPCell(new Paragraph("摄像头门禁事件记录", headerFont));
+			cell.setHorizontalAlignment(1);
+			cell.setColspan(4);
+			table.addCell(cell);
+			table.addCell(selector.process("设备类型"));
+			table.addCell(selector.process("设备名称"));
+			table.addCell(selector.process("发生时间"));
+			table.addCell(selector.process("事件原因"));
+
+			for (VEventsId e : list) {
+				table.addCell(selector.process("" + e.getType()));
+				table.addCell(selector.process("" + e.getName()));
+				table.addCell(selector.process("" + e.getVtime()));
+				table.addCell(selector.process("断线"));
 			}
 			doc.add(table);
 			doc.close();

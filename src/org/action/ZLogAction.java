@@ -36,6 +36,7 @@ public class ZLogAction extends ActionSupport {
 	 * 1.获取操作日志
 	 */
 	public String getLogList() {
+		// Long startTime = System.currentTimeMillis();
 		ZLogDao lDao = new ZLogDaoImp();
 		Map<String, Object> map = new HashMap<>();
 		try {
@@ -81,52 +82,99 @@ public class ZLogAction extends ActionSupport {
 			e1.printStackTrace();
 			result = R.getJson(0, "参数转换错误，请输入正确的日期格式yyyy-MM-dd", "");
 		}
+		// System.out.println(System.currentTimeMillis() - startTime);
 		return SUCCESS;
 	}
 
+	// /**
+	// * 2.删除操作日志
+	// */
+	// public String deleteLog() {
+	// ZLogDao aDao = new ZLogDaoImp();
+	// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	// if (start_time == null || end_time == null) {
+	// result = R.getJson(0, "缺少必要参数", "");
+	// return SUCCESS;
+	// }
+	// try {
+	// long start_clock = sdf.parse(start_time).getTime();
+	// long end_clock = sdf.parse(end_time).getTime();
+	// if (start_clock <= end_clock) {
+	// // if (start_clock == end_clock) {
+	// Calendar calendar = new GregorianCalendar();
+	// calendar.setTimeInMillis(end_clock);
+	// calendar.add(calendar.DATE, 1);// 把日期往后增加一天.整数往后推,负数往前移动
+	// // end_time = sdf.format(calendar.getTime());
+	// end_clock = calendar.getTimeInMillis();
+	// // }
+	// }
+	// if (aDao.deleteLog(start_clock / 1000, end_clock / 1000)) {
+	// result = R.getJson(1, "删除成功", "");
+	// } else {
+	// result = R.getJson(0, "删除失败", "");
+	// }
+	// } catch (ParseException e) {
+	// result = R.getJson(0, "数据解析失败，请输入正确的日期格式", "");
+	// }
+	// return SUCCESS;
+	// }
+
 	/**
-	 * 2.删除操作日志
+	 * 2.转存为pdf
 	 */
-	public String deleteLog() {
+	public String transferredLogPDF() {
 		ZLogDao aDao = new ZLogDaoImp();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		if (start_time == null || end_time == null) {
-			result = R.getJson(0, "缺少必要参数", "");
-			return SUCCESS;
-		}
+		Map<String, Object> map = new HashMap<>();
 		try {
-			long start_clock = sdf.parse(start_time).getTime();
-			long end_clock = sdf.parse(end_time).getTime();
-			if (start_clock <= end_clock) {
-				// if (start_clock == end_clock) {
-				Calendar calendar = new GregorianCalendar();
-				calendar.setTimeInMillis(end_clock);
-				calendar.add(calendar.DATE, 1);// 把日期往后增加一天.整数往后推,负数往前移动
-				// end_time = sdf.format(calendar.getTime());
-				end_clock = calendar.getTimeInMillis();
-				// }
-			}
-			if (aDao.deleteLog(start_clock / 1000, end_clock / 1000)) {
-				result = R.getJson(1, "删除成功", "");
+			if (start_time == null || end_time == null) {
+				List list = aDao.getLogList(0, -1);
+				String url = PDFUtil.buidPDF(Constans.watermark, list, 2);
+				map.put("url", url);
+				if (!aDao.deleteAll()) {
+					result = R.getJson(0, "转存失败，请重试", "");
+				} else {
+					result = R.getJson(1, "", map);
+				}
 			} else {
-				result = R.getJson(0, "删除失败", "");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				long start_clock = sdf.parse(start_time).getTime();
+				long end_clock = sdf.parse(end_time).getTime();
+				if (start_clock <= end_clock) {
+					// if (start_clock == end_clock) {
+					Calendar calendar = new GregorianCalendar();
+					calendar.setTimeInMillis(end_clock);
+					calendar.add(calendar.DATE, 1);// 把日期往后增加一天.整数往后推,负数往前移动
+					end_time = sdf.format(calendar.getTime());
+					// }
+					List<VLogId> list = aDao.getLogList(0, -1, start_time,
+							end_time);
+					String url = PDFUtil.buidPDF(Constans.watermark, list, 2);
+					map.put("url", url);
+					if (!aDao.deleteLog(start_clock / 1000, end_clock / 1000)) {
+						result = R.getJson(0, "转存失败，请重试", "");
+					} else {
+						result = R.getJson(1, "", map);
+					}
+				} else {
+					result = R.getJson(0, "参数错误，请选择正确的日期", "");
+				}
 			}
-		} catch (ParseException e) {
-			result = R.getJson(0, "数据解析失败，请输入正确的日期格式", "");
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+			result = R.getJson(0, "参数转换错误，请输入正确的日期格式yyyy-MM-dd", "");
 		}
 		return SUCCESS;
 	}
 
 	/**
-	 * 3.导出成Pdf
+	 * 3.转存为pdf
 	 */
 	public String getLogPDF() {
 		ZLogDao aDao = new ZLogDaoImp();
 		Map<String, Object> map = new HashMap<>();
 		try {
-			limit = -1;
 			if (start_time == null || end_time == null) {
-				List list = aDao.getLogList(start, limit);
+				List list = aDao.getLogList(0, -1);
 				String url = PDFUtil.buidPDF(Constans.watermark, list, 2);
 				map.put("url", url);
 				result = R.getJson(1, "", map);
@@ -141,7 +189,7 @@ public class ZLogAction extends ActionSupport {
 					calendar.add(calendar.DATE, 1);// 把日期往后增加一天.整数往后推,负数往前移动
 					end_time = sdf.format(calendar.getTime());
 					// }
-					List<VLogId> list = aDao.getLogList(0, limit, start_time,
+					List<VLogId> list = aDao.getLogList(0, -1, start_time,
 							end_time);
 					String url = PDFUtil.buidPDF(Constans.watermark, list, 2);
 					map.put("url", url);
@@ -154,6 +202,16 @@ public class ZLogAction extends ActionSupport {
 			e1.printStackTrace();
 			result = R.getJson(0, "参数转换错误，请输入正确的日期格式yyyy-MM-dd", "");
 		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 导出所有日志记录并删除
+	 */
+	public String getAllLog() {
+		ZLogDao aDao = new ZLogDaoImp();
+		List<VLogId> list = aDao.getAllLog();
+		PDFUtil.buidPDF(Constans.watermark, list, 2);
 		return SUCCESS;
 	}
 

@@ -88,7 +88,7 @@ public class IPCAction extends ActionSupport {
 	public String getIPCIpByName() throws Exception {
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
 		data = new HashMap<>();
-		data.put("ipcIP", dInfoDao.getIPCIpByName(name));
+		data.put("ipcIP", dInfoDao.getHostByName(name));
 		result = R.getJson(1, "", data);
 		return SUCCESS;
 	}
@@ -103,6 +103,16 @@ public class IPCAction extends ActionSupport {
 			return SUCCESS;
 		}
 		result = R.getJson(0, "", "");
+		return SUCCESS;
+	}
+
+	/**
+	 * 初始化列表
+	 */
+	public String initRecordStatus() throws Exception {
+		ZIPCRecordingDao ipcDao = new ZIPCRecordingDaoImp();
+		ipcDao.init1();
+		result = R.getJson(1, "", "");
 		return SUCCESS;
 	}
 

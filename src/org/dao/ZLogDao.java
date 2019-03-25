@@ -21,7 +21,7 @@ public interface ZLogDao {
 	 * @param limit
 	 * @return
 	 */
-	public List getLogList(Integer start, Integer limit);
+	public List<VLogId> getLogList(Integer start, Integer limit);
 
 	/**
 	 * 3.获取总数
@@ -45,4 +45,13 @@ public interface ZLogDao {
 	 * 6.删除指定时间段的数据
 	 */
 	public boolean deleteLog(Long start_clock, Long end_clock);
+	/**
+	 * 删除所有数据
+	 */
+	public boolean deleteAll();
+	
+	/**
+	 * 7.获取所有日志
+	 */
+	public List<VLogId> getAllLog();
 }

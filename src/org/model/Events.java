@@ -1,62 +1,109 @@
 package org.model;
 
-import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Events implements Serializable{
+/**
+ * Events entity. @author MyEclipse Persistence Tools
+ */
+
+public class Events implements java.io.Serializable {
+
+	// Fields
+
 	private Long eventid;
-	private Long objectid;
 	private Integer source;
-	private Integer acknowledged ;
-	private Integer value;
+	private Integer object;
+	private Long objectid;
 	private Integer clock;
-	
-	public Events(){
-		
+	private Integer value;
+	private Integer acknowledged;
+	private Integer ns;
+
+	// Constructors
+
+	/** default constructor */
+	public Events() {
 	}
-	public Events(Long eventid, Long objectid, Integer source,
-			Integer acknowledged, Integer value, Integer clock) {
-		super();
+
+	/** minimal constructor */
+	public Events(Long eventid, Integer source, Integer object, Long objectid,
+			Integer clock, Integer value, Integer acknowledged, Integer ns) {
 		this.eventid = eventid;
-		this.objectid = objectid;
 		this.source = source;
-		this.acknowledged = acknowledged;
+		this.object = object;
+		this.objectid = objectid;
+		this.clock = clock;
 		this.value = value;
-		this.clock = clock;
+		this.acknowledged = acknowledged;
+		this.ns = ns;
 	}
-	public Integer getClock() {
-		return clock;
-	}
-	public void setClock(Integer clock) {
-		this.clock = clock;
-	}
+
+	// Property accessors
+
 	public Long getEventid() {
-		return eventid;
+		return this.eventid;
 	}
+
 	public void setEventid(Long eventid) {
 		this.eventid = eventid;
 	}
-	public Long getObjectid() {
-		return objectid;
-	}
-	public void setObjectid(Long objectid) {
-		this.objectid = objectid;
-	}
+
 	public Integer getSource() {
-		return source;
+		return this.source;
 	}
+
 	public void setSource(Integer source) {
 		this.source = source;
 	}
-	public Integer getAcknowledged() {
-		return acknowledged;
+
+	public Integer getObject() {
+		return this.object;
 	}
-	public void setAcknowledged(Integer acknowledged) {
-		this.acknowledged = acknowledged;
+
+	public void setObject(Integer object) {
+		this.object = object;
 	}
+
+	public Long getObjectid() {
+		return this.objectid;
+	}
+
+	public void setObjectid(Long objectid) {
+		this.objectid = objectid;
+	}
+
+	public Integer getClock() {
+		return this.clock;
+	}
+
+	public void setClock(Integer clock) {
+		this.clock = clock;
+	}
+
 	public Integer getValue() {
-		return value;
+		return this.value;
 	}
+
 	public void setValue(Integer value) {
 		this.value = value;
 	}
+
+	public Integer getAcknowledged() {
+		return this.acknowledged;
+	}
+
+	public void setAcknowledged(Integer acknowledged) {
+		this.acknowledged = acknowledged;
+	}
+
+	public Integer getNs() {
+		return this.ns;
+	}
+
+	public void setNs(Integer ns) {
+		this.ns = ns;
+	}
+
+
 }

@@ -41,9 +41,9 @@ public class ZLogDaoImp implements ZLogDao {
 	@Override
 	public List getLogList(Integer start, Integer limit) {
 		try {
+			// Long startTime = System.currentTimeMillis();
 			Session session = HibernateSessionFactory.getSession();
-
-			String sql = "select * from v_log order by id desc";
+			String sql = "select * from v_log ";
 			SQLQuery sqlQuery = session.createSQLQuery(sql);
 			sqlQuery.addEntity(VLog.class);
 			if (start == null)
@@ -57,11 +57,13 @@ public class ZLogDaoImp implements ZLogDao {
 			}
 			sqlQuery.setFirstResult(start);
 
+			// System.out.println(System.currentTimeMillis() - startTime);
 			List<VLog> li = sqlQuery.list();
 			List list = new ArrayList<>();
 			for (VLog l : li) {
 				list.add(l.getId()); // opertion表一定要有对应的name与日志中的operation对应,不然到这里会有空指针异常
 			}
+			// System.out.println(System.currentTimeMillis() - startTime);
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -92,8 +94,9 @@ public class ZLogDaoImp implements ZLogDao {
 	public List<VLogId> getLogList(Integer start, Integer limit,
 			String start_time, String end_time) {
 		try {
+			Long startTime = System.currentTimeMillis();
 			Session session = HibernateSessionFactory.getSession();
-			String sql = "select * from v_log where (vtime between ? and ?) order by id desc";
+			String sql = "select * from v_log where (vtime between ? and ?) ";
 			SQLQuery sqlQuery = session.createSQLQuery(sql);
 			sqlQuery.addEntity(VLog.class);
 			sqlQuery.setParameter(0, start_time);
@@ -108,12 +111,14 @@ public class ZLogDaoImp implements ZLogDao {
 				sqlQuery.setMaxResults(limit);
 			}
 			sqlQuery.setFirstResult(start);
+			System.out.println(System.currentTimeMillis() - startTime);
 
 			List<VLog> li = sqlQuery.list();
 			List list = new ArrayList<>();
 			for (VLog a : li) {
 				list.add(a.getId());
 			}
+			System.out.println(System.currentTimeMillis() - startTime);
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -128,7 +133,7 @@ public class ZLogDaoImp implements ZLogDao {
 		try {
 			Session session = HibernateSessionFactory.getSession();
 
-			String sql = "select count(*) from VLog v where (v.id.vtime between ? and ?)  order by id desc";
+			String sql = "select count(*) from VLog v where (v.id.vtime between ? and ?)  ";
 			Query query = session.createQuery(sql);
 			query.setParameter(0, start_time);
 			query.setParameter(1, end_time);
@@ -136,7 +141,6 @@ public class ZLogDaoImp implements ZLogDao {
 			Long count = (Long) query.uniqueResult();
 			return count;
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 			return 0L;
 		} finally {
@@ -162,6 +166,46 @@ public class ZLogDaoImp implements ZLogDao {
 			// TODO: handle exception
 			e.printStackTrace();
 			return false;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public boolean deleteAll() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Transaction ts = session.beginTransaction();
+			String sql = "truncate table z_log";
+			SQLQuery query = session.createSQLQuery(sql);
+			query.executeUpdate();
+			ts.commit();
+
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<VLogId> getAllLog() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "from VLog ";
+			Query query = session.createQuery(sql);
+			List<VLog> list = query.list();
+			List<VLogId> list2 = new ArrayList<>();
+			for (VLog v : list) {
+				list2.add(v.getId());
+			}
+			return list2;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		} finally {
 			HibernateSessionFactory.closeSession();
 		}

@@ -31,7 +31,7 @@ public class NVRAction extends ActionSupport { // 录像机
 	private Integer limit;
 
 	public String getNVRInfo() throws Exception {
-		Long time = System.currentTimeMillis();
+		//Long time = System.currentTimeMillis();
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
 		List<VItemValueId> list = dInfoDao.getHostList("录像机", start, limit);
 		List<Map<String, String>> li = new ArrayList<>();
@@ -48,7 +48,7 @@ public class NVRAction extends ActionSupport { // 录像机
 		data.put("total", gDao.getHostCountByGroupid(10L));
 		data.put("list", li);
 		result = R.getJson(1, "", data);
-		System.out.println(System.currentTimeMillis() - time);
+		//System.out.println(System.currentTimeMillis() - time);
 		return SUCCESS;
 	}
 

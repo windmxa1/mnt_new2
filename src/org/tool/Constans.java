@@ -9,9 +9,13 @@ public class Constans {
 	 * 适应任何系统的文件分隔符
 	 */
 	public static final String dot = File.separator;
-	public static final String pdfDir = ServletActionContext.getRequest()
+	// public static String pdfDir = "h:/kkk"+dot;
+	// public static String pdfUrl = "h:/kkk/";
+	// public static final String watermark = "h:/kkk";
+
+	public static String pdfDir = ServletActionContext.getRequest()
 			.getRealPath("/") + "pdf" + dot;
-	public static final String pdfUrl = "http://"
+	public static String pdfUrl = "http://"
 			+ ServletActionContext.getRequest().getLocalAddr() + ":"
 			+ ServletActionContext.getRequest().getLocalPort()
 			+ ServletActionContext.getRequest().getContextPath() + "/" + "pdf/";
@@ -25,5 +29,5 @@ public class Constans {
 	/**
 	 * 自动注销的时间，默认5分钟
 	 */
-	public static Long interval = 5*60L;
+	public static Long interval = 5 * 60L;
 }

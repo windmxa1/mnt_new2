@@ -22,7 +22,7 @@ public class ZOperationDaoImp implements ZOperationDao {
 				session.save(new ZOperationTime(userid, clock));
 			}
 			ts.commit();
-			System.out.println("更新最新操作时间");
+//			System.out.println("更新最新操作时间");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -34,7 +34,7 @@ public class ZOperationDaoImp implements ZOperationDao {
 
 	@Override
 	public boolean checkOpeartion(Integer userid, Long clock,Long interval) {
-		System.out.println("检测操作时间");
+//		System.out.println("检测操作时间");
 		try {
 			Session session = HibernateSessionFactory.getSession();
 			Query query = session

@@ -30,7 +30,6 @@
 	<mapping resource="org/model/HostsGroups.hbm.xml" />
 	<mapping resource="org/model/HostInventory.hbm.xml" />
 	<mapping resource="org/model/Triggersl.xml" />
-	<mapping resource="org/model/Event.xml" />
 	<mapping resource="org/model/Functions.xml" />
 	<mapping resource="org/model/Services.xml" />
 	<mapping resource="org/model/ServicesLinks.xml" />
@@ -63,6 +62,8 @@
 	<mapping resource="org/view/VItemValue.hbm.xml" />
 	<mapping resource="org/model/ZIpcRecord.hbm.xml" />
 	<mapping resource="org/model/ZIpcRecording.hbm.xml" />
+	<mapping resource="org/model/Events.hbm.xml" />
+	<mapping resource="org/view/VEvents.hbm.xml" />
 </session-factory>
 
 </hibernate-configuration>

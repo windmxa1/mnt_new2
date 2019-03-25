@@ -3,6 +3,7 @@ package org.action;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -30,11 +31,30 @@ public class SwitchAction extends ActionSupport {
 	private ZSwitchDao sDao;
 	private Integer start;
 	private Integer limit;
-	private Map<String, Object> data;
+	// private Map<String, Object> data;
 	private Integer available;
 	private Integer id;
 	private String start_time;
 	private String end_time;
+	private String name;
+
+	/**
+	 * 获取开关量设备名称列表
+	 */
+	public String getSwitchNameList() {
+		sDao = new ZSwitchDaoImp();
+		List<String> list = sDao.getSwitchNameList();
+		List list2 = new ArrayList<>();
+		for (String s : list) {
+			Map<String, String> item = new HashMap<>();
+			item.put("name", s);
+			list2.add(item);
+		}
+		Map<String, Object> data = new HashMap<>();
+		data.put("list", list2);
+		result = R.getJson(1, "", data);
+		return SUCCESS;
+	}
 
 	/**
 	 * 获取开关量列表
@@ -48,7 +68,7 @@ public class SwitchAction extends ActionSupport {
 				v.setValue("OK");
 			}
 		}
-		data = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
 		data.put("list", list);
 		data.put("total", list.size());
 		result = R.getJson(1, "", data);
@@ -140,7 +160,7 @@ public class SwitchAction extends ActionSupport {
 		sDao = new ZSwitchDaoImp();
 		List<VSwitchAlarmId> list = sDao
 				.getSwitchAlarmHistory(start, limit, id);
-		data = new HashMap<>();
+		Map data = new HashMap<>();
 		data.put("list", list);
 		data.put("count", sDao.getSwitchAlarmCount(id));
 		result = R.getJson(1, "", data);
@@ -158,16 +178,21 @@ public class SwitchAction extends ActionSupport {
 					.getSession();
 			if (end_time == null || start_time == null || end_time.equals("")
 					|| start_time.equals("")) {
-				end_time = (String) session.getAttribute("end_time_sa");
-				start_time = (String) session.getAttribute("start_time_sa");
+				end_time = (String) session.getAttribute("end_time_sw");
+				start_time = (String) session.getAttribute("start_time_sw");
 			} else {
 				/******* 保存缓存，确保下次查询也返回对应时间段的数据 ******/
-				session.setAttribute("end_time_sa", end_time);
-				session.setAttribute("start_time_sa", start_time);
+				session.setAttribute("end_time_sw", end_time);
+				session.setAttribute("start_time_sw", start_time);
+			}
+			if (name == null || name.equals("")) {
+				name = (String) session.getAttribute("name_sw");
+			} else {
+				session.setAttribute("name_sw", name);
 			}
 			if (start_time == null || end_time == null) {
-				long count = sDao.getSwitchAlarmCount();
-				List list = sDao.getSwitchAlarmHistory(start, limit);
+				long count = sDao.getSwitchAlarmCount(name);
+				List list = sDao.getSwitchAlarmHistory(start, limit, name);
 				map.put("total", count);
 				map.put("list", list);
 				result = R.getJson(1, "", map);
@@ -183,8 +208,9 @@ public class SwitchAction extends ActionSupport {
 					end_time = sdf.format(calendar.getTime());
 					// }
 					List<VSwitchAlarmId> list = sDao.getSwitchAlarmHistory(
-							start, limit, start_time, end_time);
-					Long count = sDao.getSwitchAlarmCount(start_time, end_time);
+							start, limit, start_time, end_time, name);
+					Long count = sDao.getSwitchAlarmCount(start_time, end_time,
+							name);
 					map.put("total", count);
 					map.put("list", list);
 					result = R.getJson(1, "", map);
@@ -199,35 +225,86 @@ public class SwitchAction extends ActionSupport {
 		return SUCCESS;
 	}
 
+	// /**
+	// * 2.按时段删除开关量报警日志
+	// */
+	// public String deleteSwitchAlarmHistory() {
+	// sDao = new ZSwitchDaoImp();
+	// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	// if (start_time == null || end_time == null) {
+	// result = R.getJson(0, "缺少必要参数", "");
+	// return SUCCESS;
+	// }
+	// try {
+	// long start_clock = sdf.parse(start_time).getTime();
+	// long end_clock = sdf.parse(end_time).getTime();
+	// if (start_clock <= end_clock) {
+	// // if (start_clock == end_clock) {
+	// Calendar calendar = new GregorianCalendar();
+	// calendar.setTimeInMillis(end_clock);
+	// calendar.add(calendar.DATE, 1);// 把日期往后增加一天.整数往后推,负数往前移动
+	// // end_time = sdf.format(calendar.getTime());
+	// end_clock = calendar.getTimeInMillis();
+	// // }
+	// }
+	// if (sDao.deleteSwitchAlarm(start_clock / 1000, end_clock / 1000)) {
+	// result = R.getJson(1, "删除成功", "");
+	// } else {
+	// result = R.getJson(0, "删除失败", "");
+	// }
+	// } catch (ParseException e) {
+	// result = R.getJson(0, "数据解析失败，请输入正确的日期格式", "");
+	// }
+	// return SUCCESS;
+	// }
+
 	/**
-	 * 2.按时段删除开关量报警日志
+	 * 2.按时段转存成Pdf
 	 */
-	public String deleteSwitchAlarmHistory() {
-		sDao = new ZSwitchDaoImp();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		if (start_time == null || end_time == null) {
-			result = R.getJson(0, "缺少必要参数", "");
-			return SUCCESS;
+	public String transferredSwitchAlarmPDF() {// 传参3个,start_time,end_time,name
+		if ("".equals(name)) {
+			name = null;
 		}
+		sDao = new ZSwitchDaoImp();
+		Map<String, Object> map = new HashMap<>();
 		try {
-			long start_clock = sdf.parse(start_time).getTime();
-			long end_clock = sdf.parse(end_time).getTime();
-			if (start_clock <= end_clock) {
-				// if (start_clock == end_clock) {
-				Calendar calendar = new GregorianCalendar();
-				calendar.setTimeInMillis(end_clock);
-				calendar.add(calendar.DATE, 1);// 把日期往后增加一天.整数往后推,负数往前移动
-				// end_time = sdf.format(calendar.getTime());
-				end_clock = calendar.getTimeInMillis();
-				// }
-			}
-			if (sDao.deleteSwitchAlarm(start_clock / 1000, end_clock / 1000)) {
-				result = R.getJson(1, "删除成功", "");
+			if (start_time == null || end_time == null) {
+				List list = sDao.getSwitchAlarmHistory(0, -1, name);
+				String url = PDFUtil.buidPDF(Constans.watermark, list, 0);
+				map.put("url", url);
+				if (!sDao.deleteAll()) {
+					result = R.getJson(0, "转存失败，请重试", map);
+				} else {
+					result = R.getJson(1, "", map);
+				}
 			} else {
-				result = R.getJson(0, "删除失败", "");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				long start_clock = sdf.parse(start_time).getTime();
+				long end_clock = sdf.parse(end_time).getTime();
+				if (start_clock <= end_clock) {
+					// if (start_clock == end_clock) {
+					Calendar calendar = new GregorianCalendar();
+					calendar.setTimeInMillis(end_clock);
+					calendar.add(calendar.DATE, 1);// 把日期往后增加一天.整数往后推,负数往前移动
+					end_time = sdf.format(calendar.getTime());
+					// }
+					List<VSwitchAlarmId> list = sDao.getSwitchAlarmHistory(0,
+							-1, start_time, end_time, name);
+					String url = PDFUtil.buidPDF(Constans.watermark, list, 0);
+					map.put("url", url);
+					if (!sDao.deleteSwitchAlarm(start_clock / 1000,
+							end_clock / 1000, name)) {
+						result = R.getJson(0, "转存失败,请重试", map);
+					} else {
+						result = R.getJson(1, "", map);
+					}
+				} else {
+					result = R.getJson(0, "参数错误，请选择正确的日期", "");
+				}
 			}
-		} catch (ParseException e) {
-			result = R.getJson(0, "数据解析失败，请输入正确的日期格式", "");
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+			result = R.getJson(0, "参数转换错误，请输入正确的日期格式yyyy-MM-dd", "");
 		}
 		return SUCCESS;
 	}
@@ -235,13 +312,15 @@ public class SwitchAction extends ActionSupport {
 	/**
 	 * 3.按时段导出成Pdf
 	 */
-	public String getSwitchAlarmPDF() {
+	public String getSwitchAlarmPDF() {// 传参3个,start_time,end_time,name
+		if ("".equals(name)) {
+			name = null;
+		}
 		sDao = new ZSwitchDaoImp();
 		Map<String, Object> map = new HashMap<>();
 		try {
-			limit = -1;
 			if (start_time == null || end_time == null) {
-				List list = sDao.getSwitchAlarmHistory(start, limit);
+				List list = sDao.getSwitchAlarmHistory(0, -1, name);
 				String url = PDFUtil.buidPDF(Constans.watermark, list, 0);
 				map.put("url", url);
 				result = R.getJson(1, "", map);
@@ -257,7 +336,7 @@ public class SwitchAction extends ActionSupport {
 					end_time = sdf.format(calendar.getTime());
 					// }
 					List<VSwitchAlarmId> list = sDao.getSwitchAlarmHistory(0,
-							limit, start_time, end_time);
+							-1, start_time, end_time, name);
 					String url = PDFUtil.buidPDF(Constans.watermark, list, 0);
 					map.put("url", url);
 					result = R.getJson(1, "", map);
@@ -326,6 +405,14 @@ public class SwitchAction extends ActionSupport {
 
 	public void setEnd_time(String end_time) {
 		this.end_time = end_time;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

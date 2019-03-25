@@ -37,8 +37,7 @@
 		</global-results>
 	</package>
 
-
-	<package name="sensor" extends="json-default,global" namespace="/">
+	<package name="look" extends="json-default" namespace="/">
 		<action name="getWaterloggingList" class="org.action.SensorsAction"
 			method="getWaterloggingList">	<!-- 水浸 -->
 			<result type="json" name="success">
@@ -63,12 +62,124 @@
 				<param name="root">result</param>
 			</result>
 		</action>
+		<!-- 按时间段查看告警记录列表 -->
+		<action name="getSensorsRecord" class="org.action.SensorsAction"
+			method="getSensorsRecord">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
 		<action name="getSensorHistory" class="org.action.SensorsAction"
 			method="getSensorHistory">	<!-- 获取设备数据历史记录 -->
 			<result type="json" name="success">
 				<param name="root">result</param>
 			</result>
 		</action>
+		<action name="getLogList" class="org.action.ZLogAction" method="getLogList">	<!-- 查看操作日志 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getArmingCase" class="org.action.ZUserAction"
+			method="getArmingCase">	<!-- 查看自动布防方案 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="timeCountDown" class="org.action.ZUserAction"
+			method="timeCountDown">	<!-- 判断是否超时以触发自动转存 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getRoleList" class="org.action.ZRoleAction"
+			method="getRoleList">	<!-- 获取角色列表 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<!-- 获取事件列表 -->
+		<action name="getEvents" class="org.action.DCAction" method="getEvents">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getDCInfo1" class="org.action.DCAction" method="getDCInfo">	<!-- 获取门禁信息 -->
+			<result type="json" name="success"><!-- 8门禁 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getIPCInfo1" class="org.action.IPCAction" method="getIPCInfo">	<!-- 获取摄像头信息 -->
+			<result type="json" name="success"><!-- 9 摄像 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getIPCRecordList" class="org.action.IPCAction"
+			method="getIPCRecordList">	<!-- 获取本地录像列表 -->
+			<result type="json" name="success"><!-- 9 摄像 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getNVRInfo1" class="org.action.NVRAction" method="getNVRInfo">	<!-- 获取录像机信息 -->
+			<result type="json" name="success"><!-- 10网络录像 -->
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getDCEvents" class="org.action.DCAction" method="getDCEvents">	<!-- 获取门禁事件 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getUserList" class="org.action.ZUserAction"
+			method="getUserList">	<!-- 获取用户列表 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getAuthorityList" class="org.action.ZAuthorityAction"
+			method="getAuthorityList">	<!-- -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getSwitchList" class="org.action.SwitchAction"
+			method="getSwitchList">	<!-- -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getSwitchAlarmHistory" class="org.action.SwitchAction"
+			method="getSwitchAlarmHistory">	<!-- -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="getAllSwitchAlarmHistory" class="org.action.SwitchAction"
+			method="getAllSwitchAlarmHistory">	<!-- -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+		<action name="getSwitchNameList" class="org.action.SwitchAction"
+			method="getSwitchNameList">	<!-- -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
+
+		
+	</package>
+	<!-- 查看的接口====结束 -->
+	<package name="sensor" extends="json-default,global" namespace="/">
+		<action name="getSensorRecordPDF" class="org.action.SensorsAction"
+			method="getSensorRecordPDF">	<!-- 按时段导出成Pdf -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+
 		<action name="controlAirConditioner" class="org.action.SensorsAction"
 			method="controlAirConditioner">	<!-- 控制精密空调 -->
 			<result type="json" name="success">
@@ -145,16 +256,6 @@
 	</package>
 	<package name="log_module" extends="json-default,global"
 		namespace="/">
-		<action name="getLogList" class="org.action.ZLogAction" method="getLogList">	<!-- 查看操作日志 -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
-		<action name="deleteLog" class="org.action.ZLogAction" method="deleteLog">	<!-- 删除操作日志 -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
 		<action name="getLogPDF" class="org.action.ZLogAction" method="getLogPDF">	<!-- 导出操作日志 -->
 			<result type="json" name="success">
 				<param name="root">result</param>
@@ -167,7 +268,32 @@
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="autoLogout" class="org.action.ZUserAction" method="autoLogout">	<!-- 登录 -->
+		<action name="transferredSensorRecordPDF" class="org.action.SensorsAction"
+			method="transferredSensorRecordPDF">	<!-- 按时段转存成Pdf -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="transferredEventsPDF" class="org.action.DCAction"
+			method="transferredEventsPDF">
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="transferredSwitchAlarmPDF" class="org.action.SwitchAction"
+			method="transferredSwitchAlarmPDF">	<!-- -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="transferredLogPDF" class="org.action.ZLogAction"
+			method="transferredLogPDF">	<!-- 导出操作日志 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
+		<action name="autoLogout" class="org.action.ZUserAction"
+			method="autoLogout">	<!-- 登录 -->
 			<result type="json" name="success">
 				<param name="root">result</param>
 			</result>
@@ -183,58 +309,35 @@
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="getArmingCase" class="org.action.ZUserAction"
-			method="getArmingCase">	<!-- 查看自动布防方案 -->
+		<!-- 导出事件PDF -->
+		<action name="getEventsPDF" class="org.action.DCAction" method="getEventsPDF">
 			<result type="json" name="success">
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="getDCInfo1" class="org.action.DCAction" method="getDCInfo">	<!-- 获取门禁信息 -->
-			<result type="json" name="success"><!-- 8门禁 -->
-				<param name="root">result</param>
-			</result>
-		</action>
+
+
+
 		<action name="HKArming" class="org.action.DCAction" method="HKArming">	<!-- 海康设备布撤防 -->
 			<result type="json" name="success"><!-- 8门禁 -->
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="getIPCInfo1" class="org.action.IPCAction" method="getIPCInfo">	<!-- 获取摄像头信息 -->
+
+
+		<action name="addIPCLocalRecord" class="org.action.IPCAction"
+			method="addIPCLocalRecord">	<!-- 添加本地录像路径 -->
 			<result type="json" name="success"><!-- 9 摄像 -->
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="addIPCLocalRecord" class="org.action.IPCAction" method="addIPCLocalRecord">	<!-- 添加本地录像路径 -->
-			<result type="json" name="success"><!-- 9 摄像 -->
-				<param name="root">result</param>
-			</result>
-		</action>
-		<action name="getIPCRecordList" class="org.action.IPCAction" method="getIPCRecordList">	<!-- 获取本地录像列表 -->
-			<result type="json" name="success"><!-- 9 摄像 -->
-				<param name="root">result</param>
-			</result>
-		</action>
-		<action name="getNVRInfo1" class="org.action.NVRAction" method="getNVRInfo">	<!-- 获取录像机信息 -->
-			<result type="json" name="success"><!-- 10网络录像 -->
-				<param name="root">result</param>
-			</result>
-		</action>
-		<action name="getDCEvents" class="org.action.DCAction" method="getDCEvents">	<!-- 获取门禁事件 -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
+
 		<action name="doorControl" class="org.action.DCAction" method="doorControl">	<!-- 控制门开关 -->
 			<result type="json" name="success">
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="getUserList" class="org.action.ZUserAction"
-			method="getUserList">	<!-- 获取用户列表 -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
+
 
 		<action name="updateUserInfo" class="org.action.ZUserAction"
 			method="updateUserInfo">	<!-- 更新用户信息，名字密码角色 -->
@@ -254,12 +357,7 @@
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="getRoleList" class="org.action.ZRoleAction"
-			method="getRoleList">	<!-- 获取角色列表 -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
+
 
 		<action name="addRole" class="org.action.ZRoleAction" method="addRole">	<!-- 添加角色 -->
 			<result type="json" name="success">
@@ -279,24 +377,6 @@
 			</result>
 		</action>
 
-		<action name="getAuthorityList" class="org.action.ZAuthorityAction"
-			method="getAuthorityList">	<!-- -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
-		<action name="getSwitchList" class="org.action.SwitchAction"
-			method="getSwitchList">	<!-- -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
-		<action name="getSwitchAlarmHistory" class="org.action.SwitchAction"
-			method="getSwitchAlarmHistory">	<!-- -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
 
 		<action name="updateAvailable" class="org.action.SwitchAction"
 			method="updateAvailable">	<!-- -->
@@ -309,27 +389,24 @@
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="getAllSwitchAlarmHistory" class="org.action.SwitchAction"
-			method="getAllSwitchAlarmHistory">	<!-- -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
-		<action name="deleteSwitchAlarmHistory" class="org.action.SwitchAction"
-			method="deleteSwitchAlarmHistory">	<!-- -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
+
 		<action name="getSwitchAlarmPDF" class="org.action.SwitchAction"
 			method="getSwitchAlarmPDF">	<!-- -->
 			<result type="json" name="success">
 				<param name="root">result</param>
 			</result>
 		</action>
+
 	</package>
 
-	<package name="nolog" extends="json-default,myFilter" namespace="/">
+	<package name="nolog" extends="json-default,myFilter"
+		namespace="/">
+		<action name="initRecordStatus" class="org.action.IPCAction"
+			method="initRecordStatus">	<!-- 客户端重启时初始化录像状态 -->
+			<result type="json" name="success">
+				<param name="root">result</param>
+			</result>
+		</action>
 		<action name="updateRecordStatus" class="org.action.IPCAction"
 			method="updateRecordStatus">	<!-- 修改录像状态 -->
 			<result type="json" name="success">
@@ -370,11 +447,10 @@
 				<param name="root">result</param>
 			</result>
 		</action>
-		<action name="getAlarm" class="org.action.MapAction" method="getAlarm">	<!-- 检查设备异常 -->
-			<result type="json" name="success">
-				<param name="root">result</param>
-			</result>
-		</action>
+		<!-- 检查设备异常 -->
+		<!-- <action name="getAlarm" class="org.action.MapAction" method="getAlarm"> 
+			<result type="json" name="success"> <param name="root">result</param> </result> 
+			</action> -->
 		<action name="getAlarm1" class="org.action.MapAction" method="getAlarm1">	<!-- 检查设备异常 -->
 			<result type="json" name="success">
 				<param name="root">result</param>

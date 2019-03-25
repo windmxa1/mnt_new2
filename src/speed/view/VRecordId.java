@@ -13,6 +13,8 @@ public class VRecordId implements java.io.Serializable {
 	private Integer no;
 	private Integer sensorindex;
 	private Double sensorvalue;
+	private String name;
+	private String location;
 	private String message;
 	private Timestamp time;
 
@@ -31,10 +33,12 @@ public class VRecordId implements java.io.Serializable {
 
 	/** full constructor */
 	public VRecordId(Integer no, Integer sensorindex, Double sensorvalue,
-			String message, Timestamp time) {
+			String name, String location, String message, Timestamp time) {
 		this.no = no;
 		this.sensorindex = sensorindex;
 		this.sensorvalue = sensorvalue;
+		this.name = name;
+		this.location = location;
 		this.message = message;
 		this.time = time;
 	}
@@ -63,6 +67,22 @@ public class VRecordId implements java.io.Serializable {
 
 	public void setSensorvalue(Double sensorvalue) {
 		this.sensorvalue = sensorvalue;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getLocation() {
+		return this.location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public String getMessage() {
@@ -101,6 +121,13 @@ public class VRecordId implements java.io.Serializable {
 						.getSensorvalue() != null
 						&& castOther.getSensorvalue() != null && this
 						.getSensorvalue().equals(castOther.getSensorvalue())))
+				&& ((this.getName() == castOther.getName()) || (this.getName() != null
+						&& castOther.getName() != null && this.getName()
+						.equals(castOther.getName())))
+				&& ((this.getLocation() == castOther.getLocation()) || (this
+						.getLocation() != null
+						&& castOther.getLocation() != null && this
+						.getLocation().equals(castOther.getLocation())))
 				&& ((this.getMessage() == castOther.getMessage()) || (this
 						.getMessage() != null && castOther.getMessage() != null && this
 						.getMessage().equals(castOther.getMessage())))
@@ -121,6 +148,10 @@ public class VRecordId implements java.io.Serializable {
 				* result
 				+ (getSensorvalue() == null ? 0 : this.getSensorvalue()
 						.hashCode());
+		result = 37 * result
+				+ (getName() == null ? 0 : this.getName().hashCode());
+		result = 37 * result
+				+ (getLocation() == null ? 0 : this.getLocation().hashCode());
 		result = 37 * result
 				+ (getMessage() == null ? 0 : this.getMessage().hashCode());
 		result = 37 * result

@@ -1,6 +1,8 @@
 package org.action;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,50 +65,49 @@ public class MapAction extends ActionSupport {
 		return SUCCESS;
 	}
 
-	/**
-	 * 获取机房报警(暂时不做门禁和摄像头报警)
-	 */
-	public String getAlarm() {
-		Long time = System.currentTimeMillis();
-		SensorsDao sDao = new SensorsDaoImp();
-		DeviceInfoDao dInfoDao = new DeviceDaoImp();
-		ZSwitchDao swDao = new ZSwitchDaoImp();
-		List<String> list = swDao.getAlarmDevice();
-
-		List<Object[]> speedList = sDao.getAlarmInfo();
-		List<Object[]> hkList = dInfoDao.getHKAlarmInfo();
-		String s = "";
-		if (list != null && list.size() > 0) {
-			for (String sd : list) {
-				s = s + " " + sd + "告警";
-			}
-		}
-		for (Object[] o : hkList) {
-			s = s + " " + (o[0].toString().replace("JF-", "")) + o[1] + "异常";
-		}
-		for (Object[] o : speedList) {
-			s = s + " " + o[0] + "-" + o[1] + "异常";
-		}
-		ZIPCRecordingDao ipcDao = new ZIPCRecordingDaoImp();
-		List<String> recordingList = ipcDao.getRecordingList();
-		for (String o : recordingList) {
-			s = s + " 摄像头-" + o + "正在录像";
-		}
-
-		if (s.length() == 0) {
-			result = R.getJson(1, "", "");
-		} else {
-			result = R.getJson(0, s, "");
-		}
-		System.out.println(System.currentTimeMillis() - time);
-		return SUCCESS;
-	}
+	// /**
+	// * 获取机房报警(暂时不做门禁和摄像头报警)
+	// */
+	// public String getAlarm() {
+	// Long time = System.currentTimeMillis();
+	// SensorsDao sDao = new SensorsDaoImp();
+	// DeviceInfoDao dInfoDao = new DeviceDaoImp();
+	// ZSwitchDao swDao = new ZSwitchDaoImp();
+	// List<String> list = swDao.getAlarmDevice();
+	//
+	// List<Object[]> speedList = sDao.getAlarmInfo();
+	// List<Object[]> hkList = dInfoDao.getHKAlarmInfo();
+	// String s = "";
+	// if (list != null && list.size() > 0) {
+	// for (String sd : list) {
+	// s = s + " " + sd + "告警";
+	// }
+	// }
+	// for (Object[] o : hkList) {
+	// s = s + " " + (o[0].toString().replace("JF-", "")) + o[1] + "异常";
+	// }
+	// for (Object[] o : speedList) {
+	// s = s + " " + o[0] + "-" + o[1] + "异常";
+	// }
+	// ZIPCRecordingDao ipcDao = new ZIPCRecordingDaoImp();
+	// List<String> recordingList = ipcDao.getRecordingList();
+	// for (String o : recordingList) {
+	// s = s + " 摄像头-" + o + "正在录像";
+	// }
+	//
+	// if (s.length() == 0) {
+	// result = R.getJson(1, "", "");
+	// } else {
+	// result = R.getJson(0, s, "");
+	// }
+	// System.out.println(System.currentTimeMillis() - time);
+	// return SUCCESS;
+	// }
 
 	/**
 	 * 获取机房报警(没有空调报警)
 	 */
 	public String getAlarm1() {
-		Long time = System.currentTimeMillis();
 		SensorsDao sDao = new SensorsDaoImp();
 		DeviceInfoDao dInfoDao = new DeviceDaoImp();
 		ZSwitchDao swDao = new ZSwitchDaoImp();
@@ -115,7 +116,16 @@ public class MapAction extends ActionSupport {
 		List<Object[]> speedList = sDao.getAlarmInfo();
 		List<Object[]> hkList = dInfoDao.getHKAlarmInfo();
 		List<Map<String, String>> list2 = new ArrayList<>();
-
+		List<Object[]> airList = sDao.getAirConditionList();
+		List<Object[]> recordList = dInfoDao.getRecordList();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
+		String datetime = df.format(new Date(new Date().getTime() - 300000));
+		if (sDao.getRecordIn5Min(datetime) == 0) {
+			Map<String, String> map = new HashMap<>();
+			map.put("jf", "开关量");
+			map.put("desc", "斯必得服务器告警，请远程连接到服务器查看");
+			list2.add(map);
+		}
 		if (list != null && list.size() > 0) {
 			for (String sd : list) {
 				Map<String, String> map = new HashMap<>();
@@ -127,13 +137,35 @@ public class MapAction extends ActionSupport {
 		for (Object[] o : hkList) {
 			Map<String, String> map = new HashMap<>();
 			map.put("jf", o[0].toString().replace("JF-", ""));
-			map.put("desc", o[0].toString().replace("JF-", "") + o[1] + "异常");
+			map.put("desc", o[0].toString().replace("JF-", "") + o[1] + "离线");
 			list2.add(map);
 		}
 		for (Object[] o : speedList) {
 			Map<String, String> map = new HashMap<>();
 			map.put("jf", "" + o[0]);
-			map.put("desc", o[0] + "" + o[1] + "异常");
+			if("".equals(o[2])){
+				map.put("desc", o[0] + "" + o[1] + "异常");
+			}else {
+				map.put("desc", o[0] + "" + o[1] + o[2]);
+			}
+			list2.add(map);
+		}
+		for (Object[] o : airList) {
+			Double sensorvalue = Double.parseDouble(o[2] + "");
+			String b = Long.toHexString(sensorvalue.longValue());
+			String c = "00000000".substring(b.length()) + b;
+			Integer stateNum = Integer.parseInt(c.substring(2, 4), 16);
+			if (stateNum == 0) {
+				Map<String, String> map = new HashMap<>();
+				map.put("jf", "" + o[0]);
+				map.put("desc", o[0] + "" + o[1] + "未运行");
+				list2.add(map);
+			}
+		}
+		for (Object[] o : recordList) {
+			Map<String, String> map = new HashMap<>();
+			map.put("jf", "" + o[0]);
+			map.put("desc", o[1] + "正在录像");
 			list2.add(map);
 		}
 		if (list2.size() == 0) {
@@ -141,7 +173,7 @@ public class MapAction extends ActionSupport {
 			return SUCCESS;
 		}
 		result = R.getJson(1, "", list2);
-		System.out.println(System.currentTimeMillis() - time);
+		// System.out.println(System.currentTimeMillis() - time);
 		return SUCCESS;
 	}
 
@@ -159,7 +191,7 @@ public class MapAction extends ActionSupport {
 		}
 		data = new HashMap<>();
 		data.put("list", list2);
-		System.out.println(JSONArray.fromObject(list).toString());
+		// System.out.println(JSONArray.fromObject(list).toString());
 		result = R.getJson(1, "", data);
 		return SUCCESS;
 	}
@@ -171,7 +203,7 @@ public class MapAction extends ActionSupport {
 		data = new HashMap<>();
 		Map<String, Object> session = ActionContext.getContext().getSession();
 		session.put("groupName", groupName.replace("JF-", ""));
-
+		// System.out.println(groupName);
 		SensorsDao sDao = new SensorsDaoImp();
 		List<VSensorsId> WATER = sDao.getSensorsByType2(0, -1, (short) 16);
 		List<VSensorsId> TEMP = sDao.getSensorsByType2(0, -1, (short) 48);
@@ -308,7 +340,7 @@ public class MapAction extends ActionSupport {
 			Map<String, String> infoMap = new HashMap<String, String>();
 			infoMap.put("hostIp", v.getHost());
 			infoMap.put("hostId", "" + v.getHostid());
-			infoMap.put("location", v.getGroupname()); 
+			infoMap.put("location", v.getGroupname());
 			infoMap.put("deviceName", v.getDeviceName());
 			switch (type) {
 			case "门禁":
@@ -316,7 +348,11 @@ public class MapAction extends ActionSupport {
 				String s1[] = v.getName().split(",");
 				String s2[] = v.getValue().split(",");
 				infoMap.put(s1[0], s2[0]);
-				infoMap.put(s1[1], s2[1]);
+				try {
+					infoMap.put(s1[1], s2[1]);
+				} catch (Exception e) {
+					infoMap.put(s1[1], "");
+				}
 				if (v.getHost().equals("192.168.117.121")) {
 					infoMap.put(s1[2], s2[2]);
 				}
@@ -382,7 +418,7 @@ public class MapAction extends ActionSupport {
 	 * 将传入的机房id存入缓存中
 	 */
 	public String selectGroup() {
-		System.out.println("缓存参数为groupName:" + groupName);
+		// System.out.println("缓存参数为groupName:" + groupName);
 		Map<String, Object> session = ActionContext.getContext().getSession();
 		session.put("groupName", groupName);
 		result = R.getJson(1, "", "");
@@ -395,10 +431,24 @@ public class MapAction extends ActionSupport {
 	public String clearSession() {
 		Map<String, Object> session = ActionContext.getContext().getSession();
 		session.remove("groupName");
+		
 		session.remove("start_time_l");
 		session.remove("end_time_l");
-		session.remove("start_time_sa");
+		
 		session.remove("end_time_sa");
+		session.remove("start_time_sa");
+		session.remove("location_sa");
+		session.remove("displayname_sa");
+		
+		session.remove("end_time_sw");
+		session.remove("start_time_sw");
+		session.remove("name_sw");
+		
+		session.remove("end_time_hk");
+		session.remove("start_time_hk");
+		session.remove("name_hk");
+		session.remove("type_hk");
+		
 		result = R.getJson(1, "", "");
 		return SUCCESS;
 	}

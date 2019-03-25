@@ -11,6 +11,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.util.HibernateSessionFactory;
+import org.util.HibernateSessionFactory2;
 import org.view.VDcEvents;
 import org.view.VDcEventsId;
 import org.view.VItemValue;
@@ -212,6 +213,23 @@ public class DeviceDaoImp implements DeviceInfoDao {
 	}
 
 	@Override
+	public String getHostByName(String name) {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select id.host from VItemValue where id.deviceName = ? and id.value = 'OK' ";
+			Query query = session.createQuery(sql);
+			query.setParameter(0, name);
+			query.setMaxResults(1);
+			return (String) query.uniqueResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
 	public List<VItemValueId> getHostList(String type, Integer start,
 			Integer limit) {
 		Map<String, Object> session1 = ActionContext.getContext().getSession();
@@ -286,6 +304,22 @@ public class DeviceDaoImp implements DeviceInfoDao {
 						v.getId().getGroupname().replace("JF-", ""));
 				list.add(v.getId());
 			}
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
+	public List<Object[]> getRecordList() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			String sql = "select v.groupname,v.device_name from v_item_value v where v.is_recording=1";
+			SQLQuery query = session.createSQLQuery(sql);
+			List<Object[]> list = query.list();
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();

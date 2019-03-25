@@ -24,14 +24,18 @@ public class AirControlUtils {
 	/**
 	 * 获取传输数据
 	 */
-	private static byte[] getControllByte(int ctl, int temp) {
+	private static byte[] getControllByte(int ctl, int temp, String displayname) {
 		byte[] buf = new byte[18];
 		buf[0] = (byte) 0x7F;
 		buf[1] = (byte) 0x01;
 		buf[2] = (byte) 0x0D;
 		buf[3] = (byte) 0x64;
 		buf[4] = (byte) 0x57;
-		buf[5] = (byte) 0x08;
+		if (displayname.replaceAll("[^\\d]+", "").equals("2")) {
+			buf[5] = (byte) 0x09;
+		} else {
+			buf[5] = (byte) 0x08;
+		}
 		buf[6] = (byte) 0xE0;
 		buf[7] = (byte) 0x00;
 		switch (ctl) {
@@ -56,7 +60,7 @@ public class AirControlUtils {
 			buf[13] = (byte) 0x00;
 			buf[14] = (byte) 0x00;
 			buf[15] = (byte) 0x00;
-			buf[16] = (byte) 0x56;
+			buf[16] = getXORValue(buf);
 			buf[17] = (byte) 0xEF;
 			break;
 		case 2:// 控制空调温度
@@ -90,10 +94,11 @@ public class AirControlUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean control(String host,int ctl, int temp) throws IOException {
+	public static boolean control(String host, int ctl, int temp,
+			String displayname) throws IOException {
 		boolean result = false;
 		// 7F 01 05 64 6D 01 30 00 3C EF
-		byte[] buf = getControllByte(ctl, temp);
+		byte[] buf = getControllByte(ctl, temp, displayname);
 		// 客户端在3152端口监听接收到的数据
 		DatagramSocket ds = new DatagramSocket(3152);
 		InetAddress loc = InetAddress.getByName(host);
@@ -147,14 +152,14 @@ public class AirControlUtils {
 		return result;
 	}
 
-//	public static void main(String args[]) {
-//		try {
-//			// System.out.println(control(0, 26));
-//			// System.out.println(control(1, 26));
-//			System.out.println(control(2, 24));
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+	// public static void main(String args[]) {
+	// try {
+	// // System.out.println(control(0, 26));
+	// // System.out.println(control(1, 26));
+	// System.out.println(control(2, 24));
+	// } catch (IOException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	// }
 }

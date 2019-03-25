@@ -60,6 +60,25 @@ public class ZIPCRecordingDaoImp implements ZIPCRecordingDao {
 	}
 
 	@Override
+	public Boolean init1() {
+		try {
+			Session session = HibernateSessionFactory.getSession();
+			Transaction ts = session.beginTransaction();
+
+			String sql2 = "update z_ipc_recording set is_recording = 0 ";
+			SQLQuery query = session.createSQLQuery(sql2);
+			query.executeUpdate();
+			ts.commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			HibernateSessionFactory.closeSession();
+		}
+	}
+
+	@Override
 	public List<String> getRecordingList() {
 		try {
 			Session session = HibernateSessionFactory.getSession();
